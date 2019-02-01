@@ -1,6 +1,6 @@
 {
-  "name": "line-note",
-  "displayName": "line-note",
+  "name": "linenote",
+  "displayName": "Line Note",
   "description": "add note into source code",
   "version": "0.0.1",
   "engines": {
@@ -9,15 +9,53 @@
   "categories": [
     "Other"
   ],
+  "icon": "images/icon.png",
   "activationEvents": [
-    "onCommand:extension.helloWorld"
+    "*"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [{
-      "command": "extension.helloWorld",
-      "title": "Hello World"
-    }]
+      "command": "linenote.addNote",
+      "title": "%command.addNote.title%"
+    }, {
+      "command": "linenote.openNote",
+      "title": "%command.openNote.title%"
+    }, {
+      "command": "linenote.removeNote",
+      "title": "%command.removeNote.title%"
+    }],
+    "menus": {
+      "editor/context": [{
+        "command": "linenote.addNote"
+      }]
+    },
+    "configuration": {
+      "type": "object",
+      "title": "Line Note",
+      "properties": {
+        "linenote.lineColor": {
+          "type": "string",
+          "default": "rgba(255, 255, 0, 0.05)",
+          "description": "%configuration.lineColor.description%"
+        },
+        "linenote.rulerColor": {
+          "type": "string",
+          "default": "rgba(255, 255, 0, 0.4)",
+          "description": "%configuration.rulerColor.description%"
+        },
+        "linenote.automaticallyDelete": {
+          "type": "boolean",
+          "default": true,
+          "description": "%configuration.automaticallyDelete.description%"
+        },
+        "linenote.automaticallyDeleteInterval": {
+          "type": "integer",
+          "default": 60000,
+          "description": "%configuration.automaticallyDeleteInterval.description%"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "yarn run compile",
@@ -27,10 +65,18 @@
     "test": "yarn run compile && node ./node_modules/vscode/bin/test"
   },
   "devDependencies": {
-    "typescript": "^3.1.4",
-    "vscode": "^1.1.25",
-    "tslint": "^5.8.0",
+    "@types/chokidar": "^1.7.5",
+    "@types/lodash.debounce": "^4.0.4",
+    "@types/mocha": "^2.2.42",
     "@types/node": "^8.10.25",
-    "@types/mocha": "^2.2.42"
+    "tslint": "^5.8.0",
+    "typescript": "^3.1.4",
+    "vscode": "^1.1.25"
+  },
+  "dependencies": {
+    "@types/fs-extra": "^5.0.4",
+    "chokidar": "^2.0.4",
+    "fs-extra": "^7.0.1",
+    "lodash.debounce": "^4.0.8"
   }
 }

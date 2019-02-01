@@ -1,6 +1,6 @@
-# line-note README
+# Line Note
 
-This is the README for your extension "line-note". After writing up a brief description, we recommend including the following sections.
+This is the README for your extension "linenote". After writing up a brief description, we recommend including the following sections.
 
 ## Features
 
