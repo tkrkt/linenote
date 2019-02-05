@@ -2,13 +2,14 @@
   "name": "linenote",
   "displayName": "Line Note",
   "description": "add note into source code",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.30.0"
   },
   "categories": [
     "Other"
   ],
+  "license": "MIT",
   "icon": "images/icon.png",
   "activationEvents": [
     "*"
