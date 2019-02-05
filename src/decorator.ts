@@ -69,8 +69,8 @@ export const decorate = async () => {
 
       return {
         range: new vscode.Range(
-          editor.document.lineAt(note.from).range.start,
-          editor.document.lineAt(note.to).range.end
+          editor.document.lineAt(note.from - 1).range.start,
+          editor.document.lineAt(note.to - 1).range.end
         ),
         hoverMessage: markdown
       };

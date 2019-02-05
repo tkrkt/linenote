@@ -115,8 +115,8 @@ export const activate = (context: vscode.ExtensionContext) => {
           return;
         }
 
-        const from = editor.selection.start.line;
-        const to = editor.selection.end.line;
+        const from = editor.selection.start.line + 1;
+        const to = editor.selection.end.line + 1;
 
         const note = await Note.fromFsPath(fsPath, from, to);
 
@@ -142,8 +142,8 @@ export const activate = (context: vscode.ExtensionContext) => {
           if (await isNotePath(fsPath)) {
             return;
           }
-          const from = editor.selection.start.line;
-          const to = editor.selection.end.line;
+          const from = editor.selection.start.line + 1;
+          const to = editor.selection.end.line + 1;
           const notes = await getCorrespondingNotes(fsPath);
           await Promise.all(
             notes
@@ -169,8 +169,8 @@ export const activate = (context: vscode.ExtensionContext) => {
           if (await isNotePath(fsPath)) {
             return;
           }
-          const from = editor.selection.start.line;
-          const to = editor.selection.end.line;
+          const from = editor.selection.start.line + 1;
+          const to = editor.selection.end.line + 1;
           const notes = await getCorrespondingNotes(fsPath);
           const note = notes.find(note => note.isOverlapped(from, to));
           if (note) {
