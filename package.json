@@ -3,6 +3,7 @@
   "displayName": "Line Note",
   "description": "add note into source code",
   "version": "1.0.0",
+  "publisher": "tkrkt",
   "engines": {
     "vscode": "^1.30.0"
   },
@@ -14,6 +15,10 @@
   "activationEvents": [
     "*"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tkrkt/linenote.git"
+  },
   "main": "./out/extension.js",
   "contributes": {
     "commands": [{
