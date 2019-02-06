@@ -1,6 +1,6 @@
 # Line Note
 
-Line Note is vscode extension to add notes to the code line.
+Line Note is VSCode extension to add notes to the line of code.
 
 [VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=tkrkt.linenote)
 

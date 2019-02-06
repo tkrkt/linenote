@@ -40,7 +40,7 @@ export const activate = (context: vscode.ExtensionContext) => {
   };
   watch();
 
-  // watch notes that is not corresponding files
+  // watch notes that are not corresponding files
   const automaticallyDelete = async () => {
     if (disposed) {
       return;

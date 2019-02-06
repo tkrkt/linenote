@@ -4,6 +4,6 @@
   "command.removeNote.title": "Remove the note at current position",
   "configuration.lineColor.description": "Background color of line with notes (name or HEX)",
   "configuration.rulerColor.description": "Color of the ruler with notes (name or HEX)",
-  "configuration.automaticallyDelete.description": "If it set to true, notes that are not correspond to files are automatically deleted.",
-  "configuration.automaticallyDeleteInterval.description": "Check interval for automatic deletion. (msec)"
+  "configuration.automaticallyDelete.description": "If it set to true, notes that do not correspond to files are automatically deleted.",
+  "configuration.automaticallyDeleteInterval.description": "Monitor interval for automatic deletion. (msec)"
 }

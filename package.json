@@ -1,7 +1,7 @@
 {
   "name": "linenote",
   "displayName": "Line Note",
-  "description": "add note into source code",
+  "description": "Add notes to the line of source code",
   "version": "1.0.2",
   "publisher": "tkrkt",
   "engines": {
@@ -19,6 +19,13 @@
     "type": "git",
     "url": "https://github.com/tkrkt/linenote.git"
   },
+  "keywords": [
+    "vscode",
+    "note",
+    "comment",
+    "line",
+    "tooltip"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [{

@@ -31,7 +31,7 @@ const getAllNotes = async (dir?: string): Promise<Note[]> => {
         try {
           notes.push(await Note.fromNotePath(p));
         } catch (e) {
-          // ignore file except notes (but what?)
+          // ignore files except notes (but what?)
         }
       }
     })
@@ -87,7 +87,7 @@ export const watchCorrespondingNotes = async (
       }
     })
     .on("unlink", async (notePath: string) => {
-      // we cannnot use fs.stat because note no longer exists
+      // we cannnot use fs.stat because the note no longer exists
       try {
         const note = await Note.fromNotePath(notePath);
         if (note.fsPath === fsPath) {

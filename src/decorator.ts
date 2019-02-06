@@ -39,7 +39,7 @@ export const decorate = async () => {
   const editor = vscode.window.activeTextEditor;
   const fsPath = editor.document.uri.fsPath;
 
-  // does not target the note itself
+  // do not decorate the note itself
   if (await isNotePath(fsPath)) {
     return;
   }
