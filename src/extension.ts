@@ -62,6 +62,17 @@ export const activate = (context: vscode.ExtensionContext) => {
   };
   automaticallyDelete();
 
+  // get [from, to] from editor.selection
+  const getSelectionLineRange = (
+    editor: vscode.TextEditor
+  ): [number, number] => {
+    return [
+      // add 1 because editor's line number starts with 1, not 0
+      editor.selection.start.line + 1, // from
+      editor.selection.end.line + 1 // to
+    ];
+  };
+
   context.subscriptions.push(
     new vscode.Disposable(() => (disposed = true)),
 
@@ -114,10 +125,7 @@ export const activate = (context: vscode.ExtensionContext) => {
         if (await isNotePath(fsPath)) {
           return;
         }
-
-        const from = editor.selection.start.line + 1;
-        const to = editor.selection.end.line + 1;
-
+        const [from, to] = getSelectionLineRange(editor);
         const note = await Note.fromFsPath(fsPath, from, to);
 
         // create empty note if it does not exist
@@ -142,9 +150,8 @@ export const activate = (context: vscode.ExtensionContext) => {
           if (await isNotePath(fsPath)) {
             return;
           }
-          const from = editor.selection.start.line + 1;
-          const to = editor.selection.end.line + 1;
           const notes = await getCorrespondingNotes(fsPath);
+          const [from, to] = getSelectionLineRange(editor);
           await Promise.all(
             notes
               .filter(note => note.isOverlapped(from, to))
@@ -169,9 +176,8 @@ export const activate = (context: vscode.ExtensionContext) => {
           if (await isNotePath(fsPath)) {
             return;
           }
-          const from = editor.selection.start.line + 1;
-          const to = editor.selection.end.line + 1;
           const notes = await getCorrespondingNotes(fsPath);
+          const [from, to] = getSelectionLineRange(editor);
           const note = notes.find(note => note.isOverlapped(from, to));
           if (note) {
             await note.remove();

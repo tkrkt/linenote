@@ -69,6 +69,7 @@ export const decorate = async () => {
 
       return {
         range: new vscode.Range(
+          // subtract 1 because api's line number starts with 0, not 1
           editor.document.lineAt(note.from - 1).range.start,
           editor.document.lineAt(note.to - 1).range.end
         ),
