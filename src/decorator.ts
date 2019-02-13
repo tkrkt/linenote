@@ -44,29 +44,12 @@ export const decorate = async () => {
     return;
   }
 
+  // load notes and create decoration options
   const notes = await getCorrespondingNotes(fsPath);
   const options: vscode.DecorationOptions[] = await filterResolved(
     notes.map(async note => {
-      // create hover text
-      const markdown = new vscode.MarkdownString();
+      const markdown = new vscode.MarkdownString(await note.readAsMarkdown());
       markdown.isTrusted = true;
-
-      const body = await note.read();
-
-      const edit = `[Edit](${vscode.Uri.parse(
-        `command:linenote.openNote?${encodeURIComponent(
-          JSON.stringify(note.notePath)
-        )}`
-      )})`;
-      const remove = `[Remove](${vscode.Uri.parse(
-        `command:linenote.removeNote?${encodeURIComponent(
-          JSON.stringify(note.notePath)
-        )}`
-      )})`;
-      const nav = `*${note.name}* ${edit} ${remove}`;
-
-      markdown.appendMarkdown(`${body}\n\n${nav}`);
-
       return {
         range: new vscode.Range(
           // subtract 1 because api's line number starts with 0, not 1
@@ -87,5 +70,6 @@ export const decorate = async () => {
   if (vscode.window.activeTextEditor !== editor) {
     return;
   }
+
   editor.setDecorations(lineDecorator, options);
 };

@@ -27,9 +27,16 @@ export class Note implements Props {
   from: number;
   to: number;
   notePath: string;
-  name: string;
 
+  // extract line number from notePath
+  // e.g. #L123.md , #L23-L25.md
+  // [match, from(, to)]
   static postfixMatcher = /#L(\d+)(?:-L(\d+))?\.md$/;
+
+  // extract file path and line number from note body
+  // e.g. foo.js#L123 , #L23-25
+  // [match, file, from]
+  static lineLinkMatcher = /(\S*)#L(\d+)(?:-L\d+)?/g;
 
   constructor(props: Props) {
     // e.g. $PROJECT_ROOT/path/to/file.js
@@ -40,9 +47,6 @@ export class Note implements Props {
 
     // e.g. $PROJECT_ROOT/.vscode/linenote/path/to/file.js#L5-L10.md
     this.notePath = props.notePath;
-
-    // e.g. file.js#L5-L10.md
-    this.name = path.basename(this.notePath);
   }
 
   static async fromFsPath(
@@ -128,6 +132,53 @@ export class Note implements Props {
   async read(): Promise<string> {
     const buffer = await fs.readFile(this.notePath);
     return buffer.toString();
+  }
+
+  async readAsMarkdown(): Promise<string> {
+    // read body with replacing link
+    const body = (await this.read()).replace(
+      Note.lineLinkMatcher,
+      (match: string, file?: string, from?: string) => {
+        if (!from) {
+          return match;
+        }
+        let fsPath;
+        if (file) {
+          fsPath = path.resolve(this.fsPath, file);
+          // check file existence
+          try {
+            fs.stat(fsPath);
+          } catch (e) {
+            return match;
+          }
+        } else {
+          fsPath = this.fsPath;
+        }
+
+        return `[${match}](${vscode.Uri.parse(
+          `command:vscode.open?${encodeURIComponent(
+            JSON.stringify({
+              resource: fsPath,
+              columnOrOptions: +from
+            })
+          )}`
+        )})`;
+      }
+    );
+
+    // create footer
+    const edit = `[Edit](${vscode.Uri.parse(
+      `command:linenote.openNote?${encodeURIComponent(
+        JSON.stringify(this.notePath)
+      )}`
+    )})`;
+    const remove = `[Remove](${vscode.Uri.parse(
+      `command:linenote.removeNote?${encodeURIComponent(
+        JSON.stringify(this.notePath)
+      )}`
+    )})`;
+
+    return `${body}\n\n*${path.basename(this.notePath)}* ${edit} ${remove}`;
   }
 
   // remove empty dir recursively
