@@ -142,27 +142,33 @@ export class Note implements Props {
         if (!from) {
           return match;
         }
-        let fsPath;
+
         if (file) {
-          fsPath = path.resolve(this.fsPath, file);
+          const fsPath = path.resolve(this.fsPath, file);
           // check file existence
           try {
             fs.stat(fsPath);
+            return `[${match}](${vscode.Uri.parse(
+              `command:vscode.open?${encodeURIComponent(
+                JSON.stringify({
+                  resource: fsPath,
+                  columnOrOptions: +from
+                })
+              )}`
+            )})`;
           } catch (e) {
             return match;
           }
         } else {
-          fsPath = this.fsPath;
+          return `[${match}](${vscode.Uri.parse(
+            `command:revealLine?${encodeURIComponent(
+              JSON.stringify({
+                lineNumber: +from,
+                at: "top"
+              })
+            )}`
+          )})`;
         }
-
-        return `[${match}](${vscode.Uri.parse(
-          `command:vscode.open?${encodeURIComponent(
-            JSON.stringify({
-              resource: fsPath,
-              columnOrOptions: +from
-            })
-          )}`
-        )})`;
       }
     );
 
