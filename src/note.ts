@@ -36,7 +36,7 @@ export class Note implements Props {
   // extract file path and line number from note body
   // e.g. foo.js#L123 , #L23-25
   // [match, file, from]
-  static lineLinkMatcher = /(\S*)#L(\d+)(?:-L\d+)?/g;
+  static lineLinkMatcher = /(\S*)#L?(\d+)(?:-L?\d+)?/g;
 
   constructor(props: Props) {
     // e.g. $PROJECT_ROOT/path/to/file.js
