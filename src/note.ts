@@ -34,9 +34,9 @@ export class Note implements Props {
   static postfixMatcher = /#L(\d+)(?:-L(\d+))?\.md$/;
 
   // extract file path and line number from note body
-  // e.g. foo.js#L123 , #L23-25
+  // e.g. ../foo.js#L123 , #L23-25
   // [match, file, from]
-  static lineLinkMatcher = /(\S*)#L?(\d+)(?:-L?\d+)?/g;
+  static lineLinkMatcher = /(\S*)#L?(\d+)(?:-L?(\d+))?/g;
 
   constructor(props: Props) {
     // e.g. $PROJECT_ROOT/path/to/file.js
@@ -135,40 +135,45 @@ export class Note implements Props {
   }
 
   async readAsMarkdown(): Promise<string> {
+    const projectRootStr = await projectRoot;
+
     // read body with replacing link
     const body = (await this.read()).replace(
       Note.lineLinkMatcher,
-      (match: string, file?: string, from?: string) => {
+      (match: string, file?: string, from?: string, to?: string) => {
         if (!from) {
           return match;
         }
+        if (!to) {
+          to = from;
+        }
 
+        let fsPath: string;
         if (file) {
-          const fsPath = path.resolve(this.fsPath, file);
+          if (file.startsWith("/")) {
+            fsPath = path.join(projectRootStr, file);
+          } else {
+            fsPath = path.resolve(path.dirname(this.fsPath), file);
+          }
           // check file existence
           try {
             fs.stat(fsPath);
-            return `[${match}](${vscode.Uri.parse(
-              `command:vscode.open?${encodeURIComponent(
-                JSON.stringify({
-                  resource: fsPath,
-                  columnOrOptions: +from
-                })
-              )}`
-            )})`;
           } catch (e) {
             return match;
           }
         } else {
-          return `[${match}](${vscode.Uri.parse(
-            `command:revealLine?${encodeURIComponent(
-              JSON.stringify({
-                lineNumber: +from,
-                at: "top"
-              })
-            )}`
-          )})`;
+          fsPath = this.fsPath;
         }
+
+        return `[${match}](${vscode.Uri.parse(
+          `command:linenote.revealLine?${encodeURIComponent(
+            JSON.stringify({
+              fsPath,
+              from: +from,
+              to: +to
+            })
+          )}`
+        )})`;
       }
     );
 

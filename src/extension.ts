@@ -185,6 +185,37 @@ export const activate = (context: vscode.ExtensionContext) => {
           }
         }
       }
+    ),
+
+    vscode.commands.registerCommand(
+      "linenote.revealLine",
+      async ({
+        fsPath,
+        from,
+        to
+      }: {
+        fsPath: string;
+        from: number;
+        to: number;
+      }) => {
+        console.log(fsPath);
+        const editor = vscode.window.activeTextEditor;
+        if (editor) {
+          if (editor.document.uri.fsPath !== fsPath) {
+            await vscode.workspace.openTextDocument(vscode.Uri.file(fsPath));
+          }
+
+          const selection = new vscode.Range(
+            // subtract 1 because api's line number starts with 0, not 1
+            editor.document.lineAt(from - 1).range.start,
+            editor.document.lineAt(to - 1).range.end
+          );
+
+          await vscode.window.showTextDocument(editor.document, {
+            selection
+          });
+        }
+      }
     )
   );
 };
