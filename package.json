@@ -2,7 +2,7 @@
   "name": "linenote",
   "displayName": "Line Note",
   "description": "Add notes to the line of source code",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "publisher": "tkrkt",
   "engines": {
     "vscode": "^1.30.0"
