@@ -66,6 +66,16 @@
           "type": "integer",
           "default": 60000,
           "description": "%configuration.automaticallyDeleteInterval.description%"
+        },
+        "linenote.showGutterIcon": {
+          "type": "boolean",
+          "default": true,
+          "description": "%configuration.showGutterIcon.description%"
+        },
+        "linenote.gutterIconPath": {
+          "type": ["string", "null"],
+          "default": null,
+          "description": "%configuration.gutterIconPath.description%"
         }
       }
     }

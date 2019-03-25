@@ -5,5 +5,6 @@
   "configuration.lineColor.description": "Background color of line with notes (name or HEX)",
   "configuration.rulerColor.description": "Color of the ruler with notes (name or HEX)",
   "configuration.automaticallyDelete.description": "If it set to true, notes that do not correspond to files are automatically deleted.",
-  "configuration.automaticallyDeleteInterval.description": "Monitor interval for automatic deletion. (msec)"
+  "configuration.showGutterIcon.description": "If it set to true, displays the icon on the line where the note exists.",
+  "configuration.gutterIconPath.description": "File path of the icon to be displayed"
 }

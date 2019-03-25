@@ -1,7 +1,7 @@
 import * as fs from "fs-extra";
 import * as path from "path";
 import * as chokidar from "chokidar";
-import { filterResolved } from "./promiseUtil";
+import { filterResolved } from "./util";
 import { noteRoot, Note } from "./note";
 
 export const isNotePath = async (notePath: string): Promise<boolean> => {

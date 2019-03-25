@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import debounce = require("lodash.debounce");
-import { decorate, initDecorator } from "./decorator";
+import { Decorator } from "./decorator";
 import { Note } from "./note";
 import {
   isNotePath,
@@ -10,13 +10,14 @@ import {
 } from "./noteUtil";
 
 export const activate = (context: vscode.ExtensionContext) => {
+  const decorator: Decorator = new Decorator(context);
   let disposed: boolean = false;
 
   const decorateDebounce = debounce(() => {
     if (disposed) {
       return;
     }
-    decorate();
+    decorator.decorate();
   }, 500);
   decorateDebounce();
 
@@ -110,8 +111,8 @@ export const activate = (context: vscode.ExtensionContext) => {
         event.affectsConfiguration("linenote.lineColor") ||
         event.affectsConfiguration("linenote.rulerColor")
       ) {
-        await initDecorator();
-        await decorate();
+        decorator.reload();
+        decorator.decorate();
       }
       // linenote.automaticallyDelete is no need to check
       // because it is checked on 'automaticallyDelete'

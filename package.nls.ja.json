@@ -5,5 +5,7 @@
   "configuration.lineColor.description": "ノートがある行の背景色 (name or HEX)",
   "configuration.rulerColor.description": "ノートがある行のルーラー色 (name or HEX)",
   "configuration.automaticallyDelete.description": "trueに設定すると、ファイルに紐付いていないノートは自動的に削除されます。",
-  "configuration.automaticallyDeleteInterval.description": "自動削除を利用する際のノート監視間隔(ミリ秒)"
+  "configuration.automaticallyDeleteInterval.description": "自動削除を利用する際のノート監視間隔(ミリ秒)",
+  "configuration.showGutterIcon.description": "trueに設定すると、ノートがある行にアイコンを表示します。",
+  "configuration.gutterIconPath.description": "表示するアイコンのファイルパス"
 }
