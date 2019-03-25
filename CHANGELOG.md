@@ -12,4 +12,8 @@
 
 ## [1.1.0]
 ### Added
-- Parse link string (e.g. ../foo.js#L123 , #L23-L25) in markdown
+- Enabled to parse link string (e.g. ../foo.js#L123 , #L23-L25) in markdown
+
+## [1.2.0]
+### Added
+- Changed to show gutter icon on the line where the note exists
