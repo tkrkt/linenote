@@ -149,6 +149,8 @@ export class Note implements Props {
         }
 
         let fsPath: string;
+        let preLinkText = "";
+        let linkText: string;
         if (file) {
           if (file.startsWith("/")) {
             fsPath = path.join(projectRootStr, file);
@@ -158,14 +160,21 @@ export class Note implements Props {
           // check file existence
           try {
             fs.stat(fsPath);
+            linkText = match;
           } catch (e) {
-            return match;
+            // if text exists but the file does not,
+            // "file" string regared as just a string.
+            // i.g. "see->#L123" => "see->[#L123]($command)"
+            fsPath = this.fsPath;
+            preLinkText = file;
+            linkText = match.slice(file.length);
           }
         } else {
           fsPath = this.fsPath;
+          linkText = match;
         }
 
-        return `[${match}](${vscode.Uri.parse(
+        return `${preLinkText}[${linkText}](${vscode.Uri.parse(
           `command:linenote.revealLine?${encodeURIComponent(
             JSON.stringify({
               fsPath,
