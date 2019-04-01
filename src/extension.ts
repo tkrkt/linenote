@@ -114,8 +114,8 @@ export const activate = (context: vscode.ExtensionContext) => {
         decorator.reload();
         decorator.decorate();
       }
-      // linenote.automaticallyDelete is no need to check
-      // because it is checked on 'automaticallyDelete'
+      // we do not need to check linenote.automaticallyDelete
+      // because it is checked by 'automaticallyDelete()' every time.
     }),
 
     vscode.commands.registerCommand("linenote.addNote", async () => {
