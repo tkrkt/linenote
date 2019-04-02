@@ -35,8 +35,8 @@ export class Note implements Props {
 
   // extract file path and line number from note body
   // e.g. ../foo.js#L123 , #L23-25
-  // [match, file, from]
-  static lineLinkMatcher = /(\S*)#L?(\d+)(?:-L?(\d+))?/g;
+  // "[" or "]" or [match, file, from]
+  static lineLinkMatcher = /\[|\]|(?:([^\s#]*)#L?(\d+)(?:-L?(\d+))?)/g;
 
   constructor(props: Props) {
     // e.g. $PROJECT_ROOT/path/to/file.js
@@ -137,10 +137,24 @@ export class Note implements Props {
   async readAsMarkdown(): Promise<string> {
     const projectRootStr = await projectRoot;
 
+    // true if current position is on markdown link like: [issue #123](http://...)
+    let isInLink = false;
+
     // read body with replacing link
     const body = (await this.read()).replace(
       Note.lineLinkMatcher,
       (match: string, file?: string, from?: string, to?: string) => {
+        // ignore link if current position is on markdown link
+        if (match === "[") {
+          isInLink = true;
+          return match;
+        } else if (match === "]") {
+          isInLink = false;
+          return match;
+        } else if (isInLink) {
+          return match;
+        }
+
         if (!from) {
           return match;
         }
@@ -159,7 +173,7 @@ export class Note implements Props {
           }
           // check file existence
           try {
-            fs.stat(fsPath);
+            fs.statSync(fsPath);
             linkText = match;
           } catch (e) {
             // if text exists but the file does not,
