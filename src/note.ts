@@ -162,20 +162,24 @@ export class Note implements Props {
           to = from;
         }
 
-        let fsPath: string;
-        let preLinkText = "";
-        let linkText: string;
+        let fsPath;
+        let preLinkText;
+        let linkText;
         if (file) {
-          if (file.startsWith("/")) {
+          if (
+            file.startsWith("/") &&
+            fs.existsSync(path.join(projectRootStr, file))
+          ) {
             fsPath = path.join(projectRootStr, file);
-          } else {
-            fsPath = path.resolve(path.dirname(this.fsPath), file);
-          }
-          // check file existence
-          try {
-            fs.statSync(fsPath);
+            preLinkText = "";
             linkText = match;
-          } catch (e) {
+          } else if (
+            fs.existsSync(path.resolve(path.dirname(this.fsPath), file))
+          ) {
+            fsPath = path.resolve(path.dirname(this.fsPath), file);
+            preLinkText = "";
+            linkText = match;
+          } else {
             // if text exists but the file does not,
             // "file" string regared as just a string.
             // i.g. "see->#L123" => "see->[#L123]($command)"
@@ -185,6 +189,7 @@ export class Note implements Props {
           }
         } else {
           fsPath = this.fsPath;
+          preLinkText = "";
           linkText = match;
         }
 
