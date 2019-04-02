@@ -1,17 +1,22 @@
 import * as fs from "fs-extra";
 import * as path from "path";
+import * as vscode from "vscode";
 import * as chokidar from "chokidar";
-import { filterResolved } from "./util";
-import { noteRoot, Note } from "./note";
+import {
+  filterResolved,
+  getRootFolders,
+  fromProjectRootToNoteRoot
+} from "./util";
+import { Note } from "./note";
 
 export const isNotePath = async (notePath: string): Promise<boolean> => {
+  const [, noteRoot] = await getRootFolders(notePath);
   return notePath.startsWith(await noteRoot);
 };
 
-const getAllNotes = async (dir?: string): Promise<Note[]> => {
-  if (!dir) {
-    dir = await noteRoot;
-  }
+// it is called only by getAllNotes().
+// get all notes in $PROJECT_ROOT/.vscode/linenote
+const getAllNotesInNoteRoot = async (dir: string): Promise<Note[]> => {
   let files;
   try {
     files = await fs.readdir(dir);
@@ -22,11 +27,11 @@ const getAllNotes = async (dir?: string): Promise<Note[]> => {
   const notes: Note[] = [];
   await Promise.all(
     files.map(async f => {
-      const p = path.join(dir!, f);
+      const p = path.join(dir, f);
       const stat = await fs.stat(p);
       if (stat.isDirectory()) {
         // recursive
-        notes.push(...(await getAllNotes(p)));
+        notes.push(...(await getAllNotesInNoteRoot(p)));
       } else if (stat.isFile()) {
         try {
           notes.push(await Note.fromNotePath(p));
@@ -37,6 +42,21 @@ const getAllNotes = async (dir?: string): Promise<Note[]> => {
     })
   );
   return notes;
+};
+
+// get all notes in all workspaces
+const getAllNotes = async (): Promise<Note[]> => {
+  const folders = vscode.workspace.workspaceFolders;
+  if (folders) {
+    return (await Promise.all(
+      folders.map(async f => {
+        const noteRoot = fromProjectRootToNoteRoot(f.uri.fsPath);
+        return await getAllNotesInNoteRoot(noteRoot);
+      })
+    )).reduce((acc, arr) => acc.concat(arr), []); // flat
+  } else {
+    return [];
+  }
 };
 
 export const removeNotCorrespondingNotes = async () => {

@@ -1,6 +1,7 @@
 import * as fs from "fs-extra";
 import * as path from "path";
 import * as vscode from "vscode";
+import { getRootFolders } from "./util";
 
 export interface Props {
   fsPath: string;
@@ -8,19 +9,6 @@ export interface Props {
   to: number;
   notePath: string;
 }
-
-export const projectRoot: Promise<string> = (async () => {
-  if (vscode.workspace.workspaceFolders) {
-    return vscode.workspace.workspaceFolders[0].uri.fsPath;
-  } else {
-    throw new Error("workspace not found");
-  }
-})();
-
-// $PROJECT_ROOT/.vscode/linenote
-export const noteRoot: Promise<string> = (async () => {
-  return path.join(await projectRoot, ".vscode", "linenote");
-})();
 
 export class Note implements Props {
   fsPath: string;
@@ -54,12 +42,13 @@ export class Note implements Props {
     from: number = 0,
     to: number = 0
   ): Promise<Note> {
-    const relativePath = path.relative(await projectRoot, fsPath);
+    const [projectRoot, noteRoot] = await getRootFolders(fsPath);
+    const relativePath = path.relative(projectRoot, fsPath);
     if (relativePath.startsWith("..")) {
       throw new Error("invalid file path");
     }
 
-    const noteFile = path.resolve(await noteRoot, relativePath);
+    const noteFile = path.resolve(noteRoot, relativePath);
     const postfix = from < to ? `L${from}-L${to}` : `L${from}`;
 
     return new Note({
@@ -71,18 +60,17 @@ export class Note implements Props {
   }
 
   static async fromNotePath(notePath: string): Promise<Note> {
-    const projectRootStr = await projectRoot;
-    const noteRootStr = await noteRoot;
+    const [projectRoot, noteRoot] = await getRootFolders(notePath);
 
     const postfixes = notePath.match(Note.postfixMatcher);
-    if (notePath.startsWith(noteRootStr) && postfixes) {
+    if (notePath.startsWith(noteRoot) && postfixes) {
       const [postfix, from, to] = postfixes;
       const relativePath = path.relative(
-        noteRootStr,
-        notePath.slice(0, -postfix.length)
+        noteRoot,
+        notePath.slice(0, -postfix.length) // trim postfix: foo.js#L42.md => foo.js
       );
       return new Note({
-        fsPath: path.resolve(projectRootStr, relativePath),
+        fsPath: path.resolve(projectRoot, relativePath),
         from: +from,
         to: to ? +to : +from,
         notePath
@@ -135,7 +123,7 @@ export class Note implements Props {
   }
 
   async readAsMarkdown(): Promise<string> {
-    const projectRootStr = await projectRoot;
+    const [projectRoot] = await getRootFolders(this.fsPath);
 
     // true if current position is on markdown link like: [issue #123](http://...)
     let isInLink = false;
@@ -168,9 +156,9 @@ export class Note implements Props {
         if (file) {
           if (
             file.startsWith("/") &&
-            fs.existsSync(path.join(projectRootStr, file))
+            fs.existsSync(path.join(projectRoot, file))
           ) {
-            fsPath = path.join(projectRootStr, file);
+            fsPath = path.join(projectRoot, file);
             preLinkText = "";
             linkText = match;
           } else if (
@@ -222,7 +210,8 @@ export class Note implements Props {
 
   // remove empty dir recursively
   private async removeDir(dir: string): Promise<void> {
-    if (dir.startsWith(await noteRoot)) {
+    const [, noteRoot] = await getRootFolders(dir);
+    if (dir.startsWith(noteRoot)) {
       const files = await fs.readdir(dir);
       if (!files.length) {
         await fs.rmdir(dir);
