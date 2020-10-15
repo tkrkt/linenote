@@ -10,6 +10,13 @@ export interface Props {
   notePath: string;
 }
 
+export enum Severity {
+  Default = 0,
+  Low = 1,
+  Medium = 2,
+  High = 3
+}
+
 export class Note implements Props {
   fsPath: string;
   from: number;
@@ -25,6 +32,10 @@ export class Note implements Props {
   // e.g. ../foo.js#L123 , #L23-25
   // "[" or "]" or [match, file, from]
   static lineLinkMatcher = /\[|\]|(?:([^\s#]*)#L?(\d+)(?:-L?(\d+))?)/g;
+
+  // extract note severity from note body
+  // e.g. #high #medium #low
+  static severityMatcher = /#(high|medium|low)/i;
 
   constructor(props: Props) {
     // e.g. $PROJECT_ROOT/path/to/file.js
@@ -120,6 +131,19 @@ export class Note implements Props {
   async read(): Promise<string> {
     const buffer = await fs.readFile(this.notePath);
     return buffer.toString();
+  }
+
+  async readSeverity(): Promise<Severity> {
+    const found = (await this.read()).match(Note.severityMatcher);
+    if (found) {
+      console.log('found', found)
+      switch (found[0].toLowerCase()) {
+        case '#low': return Severity.Low;
+        case '#medium': return Severity.Medium;
+        case '#high': return Severity.High;
+      }
+    }
+    return Severity.Default;
   }
 
   async readAsMarkdown(): Promise<string> {
