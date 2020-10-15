@@ -74,6 +74,29 @@ export const activate = (context: vscode.ExtensionContext) => {
     ];
   };
 
+  const removeNoteImmediately = async (notePath?: string) => {
+    const editor = vscode.window.activeTextEditor;
+    if (notePath) {
+      // remove specified note (when invoked from the hover text)
+      const note = await Note.fromNotePath(notePath);
+      await note.remove();
+      decorateDebounce();
+    } else if (editor) {
+      // remove one note at current cursor (when invoked from the command palette)
+      const fsPath = editor.document.uri.fsPath;
+      if (await isNotePath(fsPath)) {
+        return;
+      }
+      const notes = await getCorrespondingNotes(fsPath);
+      const [from, to] = getSelectionLineRange(editor);
+      const note = notes.find(note => note.isOverlapped(from, to));
+      if (note) {
+        await note.remove();
+        decorateDebounce();
+      }
+    }
+  };
+
   context.subscriptions.push(
     new vscode.Disposable(() => (disposed = true)),
 
@@ -164,27 +187,21 @@ export const activate = (context: vscode.ExtensionContext) => {
 
     vscode.commands.registerCommand(
       "linenote.removeNote",
+      removeNoteImmediately
+    ),
+
+    vscode.commands.registerCommand(
+      "linenote.removeNoteWithConfirmation",
       async (notePath?: string) => {
-        const editor = vscode.window.activeTextEditor;
-        if (notePath) {
-          // remove specified note (when invoked from the hover text)
-          const note = await Note.fromNotePath(notePath);
-          await note.remove();
-          decorateDebounce();
-        } else if (editor) {
-          // remove one note at current cursor (when invoked from the command palette)
-          const fsPath = editor.document.uri.fsPath;
-          if (await isNotePath(fsPath)) {
-            return;
-          }
-          const notes = await getCorrespondingNotes(fsPath);
-          const [from, to] = getSelectionLineRange(editor);
-          const note = notes.find(note => note.isOverlapped(from, to));
-          if (note) {
-            await note.remove();
-            decorateDebounce();
-          }
+        const confirmed = await vscode.window
+          .showInformationMessage(`Are you sure you'd like to permanently remove this note?`,
+            ...['Yes', 'No']) === 'Yes';
+        
+        if (!confirmed) {
+          return;
         }
+
+        return await removeNoteImmediately(notePath);
       }
     ),
 
