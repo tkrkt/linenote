@@ -2,6 +2,7 @@
   "command.addNote.title": "Add note at current position",
   "command.openNote.title": "Open notes at current position",
   "command.removeNote.title": "Remove the note at current position",
+  "command.removeNoteWithConfirmation.title": "Remove the note at current position, but confirm first",
   "configuration.lineColor.description": "Background color of line with notes (name or HEX)",
   "configuration.rulerColor.description": "Color of the ruler with notes (name or HEX)",
   "configuration.automaticallyDelete.description": "If it set to true, notes that do not correspond to files are automatically deleted.",

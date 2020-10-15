@@ -200,12 +200,12 @@ export class Note implements Props {
       )}`
     )})`;
     const remove = `[Remove](${vscode.Uri.parse(
-      `command:linenote.removeNote?${encodeURIComponent(
+      `command:linenote.removeNoteWithConfirmation?${encodeURIComponent(
         JSON.stringify(this.notePath)
       )}`
     )})`;
 
-    return `${body}\n\n*${path.basename(this.notePath)}* ${edit} ${remove}`;
+    return `${body}\n\n*${path.basename(this.notePath)}* | ${edit} | ${remove}`;
   }
 
   // remove empty dir recursively

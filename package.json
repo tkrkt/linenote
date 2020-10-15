@@ -37,6 +37,9 @@
     }, {
       "command": "linenote.removeNote",
       "title": "%command.removeNote.title%"
+    }, {
+      "command": "linenote.removeNoteWithConfirmation",
+      "title": "%command.removeNoteWithConfirmation.title%"
     }],
     "menus": {
       "editor/context": [{
