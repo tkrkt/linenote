@@ -1,11 +1,13 @@
 import * as vscode from "vscode";
 import { filterResolved, splitArr } from "./util";
 import { getCorrespondingNotes, isNotePath } from "./noteUtil";
+import { Severity } from './note';
 
 export class Decorator {
   context: vscode.ExtensionContext;
   lineDecorator?: vscode.TextEditorDecorationType;
   gutterDecorator?: vscode.TextEditorDecorationType;
+  severity: Severity | undefined;
 
   constructor(context: vscode.ExtensionContext) {
     this.context = context;
@@ -16,14 +18,10 @@ export class Decorator {
     if (this.lineDecorator) {
       this.lineDecorator.dispose();
     }
-    if (this.gutterDecorator) {
-      this.gutterDecorator.dispose();
-    }
 
     const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration();
 
     const lineProp: vscode.DecorationRenderOptions = {};
-    const gutterProp: vscode.DecorationRenderOptions = {};
 
     // set line color
     const line: string | undefined = config.get("linenote.lineColor");
@@ -38,25 +36,62 @@ export class Decorator {
       lineProp.overviewRulerColor = ruler.trim();
     }
 
+
+    this.lineDecorator = vscode.window.createTextEditorDecorationType(lineProp);
+    this.maybeReloadGutterDecorator(Severity.Default);
+  }
+
+  maybeReloadGutterDecorator(newSeverity: Severity) {
+    const gutterProp: vscode.DecorationRenderOptions = {};
+    const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration();
+
     const showGutterIcon: boolean | undefined = config.get(
       "linenote.showGutterIcon"
     );
-    if (showGutterIcon) {
-      let iconPath: string | undefined = config.get("linenote.gutterIconPath");
-      if (iconPath) {
-        gutterProp.gutterIconPath = iconPath;
-      } else {
-        gutterProp.gutterIconPath = this.context.asAbsolutePath(
-          "images/gutter.png"
-        );
-      }
-      gutterProp.gutterIconSize = "cover";
-    }
 
-    this.lineDecorator = vscode.window.createTextEditorDecorationType(lineProp);
-    this.gutterDecorator = vscode.window.createTextEditorDecorationType(
-      gutterProp
-    );
+    if (this.severity === undefined || this.severity !== newSeverity) {
+      // since we're going to switch decorators, dispose if needed
+      if (this.gutterDecorator) {
+        this.gutterDecorator.dispose();
+      }
+
+      switch (newSeverity) {
+        case Severity.Low:
+          gutterProp.gutterIconSize = "cover";
+          gutterProp.gutterIconPath = this.context.asAbsolutePath(
+            "images/gutter-low.png"
+          );
+          break;
+        case Severity.Medium:
+          gutterProp.gutterIconSize = "cover";
+          gutterProp.gutterIconPath = this.context.asAbsolutePath(
+            "images/gutter-medium.png"
+          );
+          break;
+        case Severity.High:
+          gutterProp.gutterIconSize = "cover";
+          gutterProp.gutterIconPath = this.context.asAbsolutePath(
+            "images/gutter-high.png"
+          );
+          break;
+        default:
+          if (showGutterIcon) {
+            let iconPath: string | undefined = config.get("linenote.gutterIconPath");
+            if (iconPath) {
+              gutterProp.gutterIconPath = iconPath;
+            } else {
+              gutterProp.gutterIconPath = this.context.asAbsolutePath(
+                "images/gutter.png"
+              );
+            }
+            gutterProp.gutterIconSize = "cover";
+          }
+      }
+
+      this.gutterDecorator = vscode.window.createTextEditorDecorationType(
+        gutterProp
+      );
+    }
   }
 
   async decorate() {
@@ -72,6 +107,9 @@ export class Decorator {
       return;
     }
 
+    // if any note has severity marked, use the "most severe" for gutter icon color
+    let newSeverity = Severity.Default;
+
     // load notes and create decoration options
     const notes = await getCorrespondingNotes(fsPath);
     const [lineProps, gutterProps] = splitArr(
@@ -84,6 +122,13 @@ export class Decorator {
               await note.readAsMarkdown()
             );
             markdown.isTrusted = true;
+
+            // check if the note has a severity tag in its body
+            const noteSeverity = await note.readSeverity();
+            if (noteSeverity > newSeverity) {
+              newSeverity = noteSeverity;
+            }
+
             return [
               {
                 range: new vscode.Range(
@@ -110,6 +155,9 @@ export class Decorator {
     if (vscode.window.activeTextEditor !== editor) {
       return;
     }
+
+    // reset gutter icon, if necessary
+    this.maybeReloadGutterDecorator(newSeverity);
 
     editor.setDecorations(this.lineDecorator!, lineProps);
     editor.setDecorations(this.gutterDecorator!, gutterProps);

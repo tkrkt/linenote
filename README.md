@@ -13,4 +13,7 @@ Notes are saved in `$PROJECT_ROOT/.vscode/linenote` like `.vscode/linenote/path/
 
 ![example](https://i.imgur.com/KlQtCsL.gif)
 
-Tips: You can put hyperlinks in notes by writing `#L42` or `../foo.js#L12-L15`.
+## Tips
+
+- You can put hyperlinks in notes by writing `#L42` or `../foo.js#L12-L15`.
+- You can change the severity/color of the note with #low, #medium, #high tags
