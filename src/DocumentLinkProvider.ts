@@ -17,7 +17,7 @@ export class NoteLinkProvider implements DocumentLinkProvider {
       const editEndPosition = new Position(line.lineNumber, editIndex + editText.length);
       const editRange = new Range(editPosition, editEndPosition);
       const editUri = Uri.parse(
-        `command:linenote.openNote?${encodeURIComponent(
+        `command:linenoteplus.openNote?${encodeURIComponent(
           JSON.stringify(uuid)
         )}`
       );
@@ -26,7 +26,7 @@ export class NoteLinkProvider implements DocumentLinkProvider {
       const removeEndPosition = new Position(line.lineNumber, removeIndex + removeText.length);
       const removeRange = new Range(removePosition, removeEndPosition);
       const removeUri = Uri.parse(
-        `command:linenote.removeNote?${encodeURIComponent(
+        `command:linenoteplus.removeNote?${encodeURIComponent(
           JSON.stringify(uuid)
         )}`
       );

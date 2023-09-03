@@ -33,7 +33,7 @@ export const activate = (context: vscode.ExtensionContext) => {
   const exclude: any = conf.get('files.exclude');
   const excludeFiles = {
     ...exclude,
-    ['.vscode/linenout']: true,
+    ['.vscode/linenoteplus']: true,
   };
   conf.update('files.exclude', excludeFiles);
   
@@ -46,7 +46,7 @@ export const activate = (context: vscode.ExtensionContext) => {
       }
       const interval = vscode.workspace
         .getConfiguration()
-        .get("linenote.cleanUpOrphanedNotesInterval");
+        .get("linenoteplus.cleanUpOrphanedNotesInterval");
       if (typeof interval === "number" && interval >= 0) {
         const start = +new Date();
         await cleanUpOrphanedNotes();
@@ -65,7 +65,7 @@ export const activate = (context: vscode.ExtensionContext) => {
   // set cleanup orphaned nodes logic
   // based on conf
   const cleanupOrphanedNodes =
-    conf.get<CleanUpOrphanedNodesConf>('linenote.cleanUpOrphanedNotes')!;
+    conf.get<CleanUpOrphanedNodesConf>('linenoteplus.cleanUpOrphanedNotes')!;
   switch (cleanupOrphanedNodes) {
     case 'on-save':
       cleanupOnSave();
@@ -138,23 +138,23 @@ export const activate = (context: vscode.ExtensionContext) => {
       const note = globalActiveNoteMarkers[uuid];
       const body = await note.read();
       if (!body.trim().length) {
-        await vscode.commands.executeCommand('linenote.removeNote', uuid);
+        await vscode.commands.executeCommand('linenoteplus.removeNote', uuid);
       }
     }),
 
     vscode.workspace.onDidChangeConfiguration(async event => {
       if (
-        event.affectsConfiguration("linenote.lineColor") ||
-        event.affectsConfiguration("linenote.rulerColor") || 
-        event.affectsConfiguration("linenote.cleanupOrphanedNotes") ||
-        event.affectsConfiguration("linenote.cleanupOrphanedNotesInterval")
+        event.affectsConfiguration("linenoteplus.lineColor") ||
+        event.affectsConfiguration("linenoteplus.rulerColor") || 
+        event.affectsConfiguration("linenoteplus.cleanupOrphanedNotes") ||
+        event.affectsConfiguration("linenoteplus.cleanupOrphanedNotesInterval")
       ) {
         decorator.reload();
         decorator.decorate();
       }
     }),
 
-    registerCommand('linenote.addNote', async (_uuid?: string) => {
+    registerCommand('linenoteplus.addNote', async (_uuid?: string) => {
       const editor = getEditor();
       const filePath = editor.document.uri.fsPath;
       const noteDir = getNotesDir(editor.document.fileName);
@@ -194,7 +194,7 @@ export const activate = (context: vscode.ExtensionContext) => {
       await note.open();
     }),
 
-    registerCommand('linenote.openNote', async (uuid?: string) => {
+    registerCommand('linenoteplus.openNote', async (uuid?: string) => {
       const editor = getEditor();
       const filePath = editor.document.uri.fsPath;
       const noteDir = getNotesDir(editor.document.fileName);
@@ -230,7 +230,7 @@ export const activate = (context: vscode.ExtensionContext) => {
     }),
 
     registerCommand(
-      "linenote.removeNote",
+      "linenoteplus.removeNote",
       async (uuid?: string) => {
         const _uuid = uuid || Note.matchUuidOnActiveLine(getEditor());
         if (_uuid) {
@@ -251,7 +251,7 @@ export const activate = (context: vscode.ExtensionContext) => {
       }
     ),
 
-    registerCommand("linenote.revealLine", async () => {
+    registerCommand("linenoteplus.revealLine", async () => {
       const editor = getEditor();
       const filePath = editor.document.uri.fsPath;
       if (!isNotePath(filePath)) {

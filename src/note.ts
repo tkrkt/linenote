@@ -30,7 +30,7 @@ export class Note implements Props {
   constructor(props: ConstructorProps) {
     this.filePath = props.filePath;
     this.uuid = props.uuid,
-    // e.g. $PROJECT_ROOT/.vscode/linenote/73WakrfVbNJBaAmhQtEeDv.md
+    // e.g. $PROJECT_ROOT/.vscode/linenoteplus/73WakrfVbNJBaAmhQtEeDv.md
     this.notePath = path.join(props.noteDir, this.uuid + '.md');
     this.line = props.line;
   }
@@ -130,12 +130,12 @@ export class Note implements Props {
 
     // create footer
     const edit = `[Edit](${vscode.Uri.parse(
-      `command:linenote.openNote?${encodeURIComponent(
+      `command:linenoteplus.openNote?${encodeURIComponent(
         JSON.stringify(this.uuid)
       )}`
     )})`;
     const remove = `[Remove](${vscode.Uri.parse(
-      `command:linenote.removeNote?${encodeURIComponent(
+      `command:linenoteplus.removeNote?${encodeURIComponent(
         JSON.stringify(this.uuid)
       )}`
     )})`;

@@ -45,7 +45,7 @@ export const cleanUpOrphanedNotes = async () => {
     }
     await Promise.all(uuidsToDelete.map(async uuid => {
       if (uuid) {
-        await vscode.commands.executeCommand('linenote.removeNote', uuid);
+        await vscode.commands.executeCommand('linenoteplus.removeNote', uuid);
       }
     }));
   }

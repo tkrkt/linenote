@@ -30,23 +30,23 @@ export class Decorator {
     const gutterProp: vscode.DecorationRenderOptions = {};
 
     // set line color
-    const line: string | undefined = config.get("linenote.lineColor");
+    const line: string | undefined = config.get("linenoteplus.lineColor");
     if (line && line.trim().length) {
       noteMarkerProp.backgroundColor = line.trim();
     }
 
     // set ruler color
-    const ruler: string | undefined = config.get("linenote.rulerColor");
+    const ruler: string | undefined = config.get("linenoteplus.rulerColor");
     if (ruler && ruler.trim().length) {
       noteMarkerProp.overviewRulerLane = vscode.OverviewRulerLane.Right;
       noteMarkerProp.overviewRulerColor = ruler.trim();
     }
 
     const showGutterIcon: boolean | undefined = config.get(
-      "linenote.showGutterIcon"
+      "linenoteplus.showGutterIcon"
     );
     if (showGutterIcon) {
-      let iconPath: string | null = config.get<string | null>("linenote.gutterIconPath")!;
+      let iconPath: string | null = config.get<string | null>("linenoteplus.gutterIconPath")!;
       if (iconPath) {
         gutterProp.gutterIconPath = iconPath;
       } else {

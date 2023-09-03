@@ -1,16 +1,17 @@
-# Line Note
+# Line Note Plus
 
-Line Note is VSCode extension to add notes to the line of code.
+Line Note Plus is a VSCode extension to add Markdown notes to your code
+that are visible when hovering over the noted line.
 
-[VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=tkrkt.linenote)
+[VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=prmichaelsen.linenoteplus)
 
 ## Features
 
-Select lines and invoke `Add note at current position` from the command palette or context menu.
+Invoke `Add note at current position` from the command palette or context menu.
 You can see the note you wrote as hover text.
 
-Notes are saved in `$PROJECT_ROOT/.vscode/linenote` like `.vscode/linenote/path/to/code.js#L13-L42.md`.
+Notes are saved in `$PROJECT_ROOT/.vscode/linenoteplus` like `.vscode/linenoteplus/<short-uid>.md`.
 
-![example](https://i.imgur.com/KlQtCsL.gif)
-
-Tips: You can put hyperlinks in notes by writing `#L42` or `../foo.js#L12-L15`.
+### Demo
+* Adding and removeing notes: https://storage.googleapis.com/com-f5-parm.appspot.com/parm/images/XK7AHFrBrfD7LpliwDX5.quicktime
+* Notes move with code: https://storage.googleapis.com/com-f5-parm.appspot.com/parm/images/KbetjziHdRWmfHpJu5FN.quicktime

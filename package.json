@@ -1,9 +1,9 @@
 {
-  "name": "linenote",
-  "displayName": "Line Note",
+  "name": "linenoteplus",
+  "displayName": "Line Note Plus",
   "description": "Add notes to the line of source code",
-  "version": "1.2.1",
-  "publisher": "tkrkt",
+  "version": "1.2.2",
+  "publisher": "prmichaelsen",
   "engines": {
     "vscode": "^1.30.0"
   },
@@ -17,12 +17,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/tkrkt/linenote.git"
+    "url": "https://github.com/prmichaelsen/linenoteplus.git"
   },
   "keywords": [
     "vscode",
     "note",
     "comment",
+    "notataion",
+    "annotation",
     "line",
     "tooltip"
   ],
@@ -30,58 +32,58 @@
   "contributes": {
     "commands": [
       {
-        "command": "linenote.addNote",
+        "command": "linenoteplus.addNote",
         "title": "%command.addNote.title%"
       },
       {
-        "command": "linenote.openNote",
+        "command": "linenoteplus.openNote",
         "title": "%command.openNote.title%"
       },
       {
-        "command": "linenote.revealLine",
+        "command": "linenoteplus.revealLine",
         "title": "%command.revealLine.title%"
       },
       {
-        "command": "linenote.removeNote",
+        "command": "linenoteplus.removeNote",
         "title": "%command.removeNote.title%"
       }
     ],
     "menus": {
       "editor/context": [
         {
-          "command": "linenote.addNote"
+          "command": "linenoteplus.addNote"
         },
         {
-          "command": "linenote.revealLine",
+          "command": "linenoteplus.revealLine",
           "when": "isActiveEditorNote"
         }
       ]
     },
     "configuration": {
       "type": "object",
-      "title": "Line Note",
+      "title": "Line Note Plus",
       "properties": {
-        "linenote.lineColor": {
+        "linenoteplus.lineColor": {
           "type": "string",
           "default": "rgba(255, 255, 0, 0.05)",
           "description": "%configuration.lineColor.description%"
         },
-        "linenote.rulerColor": {
+        "linenoteplus.rulerColor": {
           "type": "string",
           "default": "rgba(255, 255, 0, 0.4)",
           "description": "%configuration.rulerColor.description%"
         },
-        "linenote.cleanUpOrphanedNotesInterval": {
+        "linenoteplus.cleanUpOrphanedNotesInterval": {
           "type": "integer",
           "default": 60000,
           "description": "%configuration.cleanUpOrphanedNotesInterval.description%"
         },
-        "linenote.showGutterIcon": {
+        "linenoteplus.showGutterIcon": {
           "type": "boolean",
           "default": true,
           "description": "%configuration.showGutterIcon.description%"
         },
-        "linenote.gutterIconPath": {
+        "linenoteplus.gutterIconPath": {
           "type": [
             "string",
             "null"
@@ -89,7 +91,7 @@
           "default": "images/gutter.png",
           "description": "%configuration.gutterIconPath.description%"
         },
-        "linenote.cleanUpOrphanedNotes": {
+        "linenoteplus.cleanUpOrphanedNotes": {
           "type": [
             "on-save",
             "on-interval",
@@ -99,11 +101,11 @@
           "default": "on-save-and-on-interval",
           "description": "%configuration.cleanUpOrphanedNotes.description%"
         },
-        "linenote.includePaths": {
+        "linenoteplus.includePaths": {
           "type": "array",
           "default": [
             "**/src/**/*",
-            "**/.vscode/linenote/**/*"
+            "**/.vscode/linenoteplus/**/*"
           ],
           "description": "%configuration.includePaths.description%"
         }
@@ -111,11 +113,11 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "yarn run compile",
+    "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "postinstall": "node ./node_modules/vscode/bin/install",
-    "test": "yarn run compile && node ./node_modules/vscode/bin/test"
+    "test": "npm run compile && node ./node_modules/vscode/bin/test"
   },
   "devDependencies": {
     "@types/chokidar": "^1.7.5",

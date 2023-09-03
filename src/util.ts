@@ -21,7 +21,7 @@ export const getUuidFromNotePath = (notePath: string) => {
   return uuid;
 }
 
-export const relNotesDir = '.vscode/linenote';
+export const relNotesDir = '.vscode/linenoteplus';
 export const getNotesDir = (filePath: string) => {
   const workspaceFolders = vscode.workspace.workspaceFolders!;
   for (const folder of workspaceFolders) {
@@ -56,7 +56,7 @@ export const getIncludedFilePaths = async (): Promise<string[]> => {
   const fNames: string[] = [];
   const includePaths = vscode.workspace
     .getConfiguration()
-    .get<string[]>('linenote.includePaths')!;
+    .get<string[]>('linenoteplus.includePaths')!;
   for (const pattern of includePaths) {
     const files = await vscode.workspace.findFiles(pattern, '');
     for (const file of files) {
@@ -66,12 +66,12 @@ export const getIncludedFilePaths = async (): Promise<string[]> => {
   return fNames;
 };
 
-// convert from $PROJECT_ROOT to $PROJECT_ROOT/.vscode/linenote
+// convert from $PROJECT_ROOT to $PROJECT_ROOT/.vscode/linenoteplus
 export const fromProjectRootToNoteRoot = (projectRoot: string): string => {
-  return path.join(projectRoot, ".vscode", "linenote");
+  return path.join(projectRoot, ".vscode", "linenoteplus");
 };
 
-// get [projectRoot, noteRoot(=projectRot/.vscode/linenote)] from file path.
+// get [projectRoot, noteRoot(=projectRot/.vscode/linenoteplus)] from file path.
 export const getRootFolders = async (
   fsPath: string
 ): Promise<[string, string]> => {

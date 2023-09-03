@@ -46,7 +46,7 @@ export const onDidSaveTextDocument = async (document: vscode.TextDocument) => {
   // decorate call is debounced.
   uuidsToDelete.forEach(async uuid => {
     if (uuid) {
-      await vscode.commands.executeCommand('linenote.removeNote', uuid);
+      await vscode.commands.executeCommand('linenoteplus.removeNote', uuid);
     }
   });
 }
