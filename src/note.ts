@@ -1,88 +1,82 @@
 import * as fs from "fs-extra";
 import * as path from "path";
 import * as vscode from "vscode";
-import { getRootFolders } from "./util";
+import { getEditor } from "./editorUtil";
+import { globalActiveNoteMarkers } from "./extension";
+import { getUuidFromMatch, getWorkspaceRoot } from "./util";
 
 export interface Props {
-  fsPath: string;
-  from: number;
-  to: number;
+  filePath: string;
   notePath: string;
+  uuid: string;
+  line: number;
 }
 
+export interface ConstructorProps {
+  filePath: string;
+  uuid: string;
+  noteDir: string;
+  line: number;
+}
+
+export const uuidRegex = /^[A-Za-z0-9]{1,}$/;
+export const noteMarkerRegex = /note:\s*[A-Za-z0-9]{1,}\s/gm;
 export class Note implements Props {
-  fsPath: string;
-  from: number;
-  to: number;
+  filePath: string;
   notePath: string;
+  uuid: string;
+  line: number;
 
-  // extract line number from notePath
-  // e.g. #L123.md , #L23-L25.md
-  // [match, from(, to)]
-  static postfixMatcher = /#L(\d+)(?:-L(\d+))?\.md$/;
-
-  // extract file path and line number from note body
-  // e.g. ../foo.js#L123 , #L23-25
-  // "[" or "]" or [match, file, from]
-  static lineLinkMatcher = /\[|\]|(?:([^\s#]*)#L?(\d+)(?:-L?(\d+))?)/g;
-
-  constructor(props: Props) {
-    // e.g. $PROJECT_ROOT/path/to/file.js
-    this.fsPath = props.fsPath;
-
-    this.from = props.from;
-    this.to = props.to;
-
-    // e.g. $PROJECT_ROOT/.vscode/linenote/path/to/file.js#L5-L10.md
-    this.notePath = props.notePath;
+  constructor(props: ConstructorProps) {
+    this.filePath = props.filePath;
+    this.uuid = props.uuid,
+    // e.g. $PROJECT_ROOT/.vscode/linenote/73WakrfVbNJBaAmhQtEeDv.md
+    this.notePath = path.join(props.noteDir, this.uuid + '.md');
+    this.line = props.line;
   }
 
-  static async fromFsPath(
-    fsPath: string,
-    from: number = 0,
-    to: number = 0
-  ): Promise<Note> {
-    const [projectRoot, noteRoot] = await getRootFolders(fsPath);
-    const relativePath = path.relative(projectRoot, fsPath);
-    if (relativePath.startsWith("..")) {
-      throw new Error("invalid file path");
+   static getLine = (document: vscode.TextDocument, uuid: string): number => {
+    for (let lineIndex = 0; lineIndex < document.lineCount; lineIndex++) {
+      const line = document.lineAt(lineIndex);
+      const charIndex = line.text.indexOf(uuid);
+      if (charIndex !== -1) {
+        return lineIndex;
+      }
     }
-
-    const noteFile = path.resolve(noteRoot, relativePath);
-    const postfix = from < to ? `L${from}-L${to}` : `L${from}`;
-
-    return new Note({
-      fsPath,
-      from,
-      to,
-      notePath: `${noteFile}#${postfix}.md`
-    });
+    throw new Error(`Note with UUID "${uuid}" not found in document "${document.uri.fsPath}".`);
   }
 
-  static async fromNotePath(notePath: string): Promise<Note> {
-    const [projectRoot, noteRoot] = await getRootFolders(notePath);
-
-    const postfixes = notePath.match(Note.postfixMatcher);
-    if (notePath.startsWith(noteRoot) && postfixes) {
-      const [postfix, from, to] = postfixes;
-      const relativePath = path.relative(
-        noteRoot,
-        notePath.slice(0, -postfix.length) // trim postfix: foo.js#L42.md => foo.js
-      );
-      return new Note({
-        fsPath: path.resolve(projectRoot, relativePath),
-        from: +from,
-        to: to ? +to : +from,
-        notePath
-      });
-    } else {
-      throw new Error(`invalid note path: ${notePath}`);
+  static matchUuids = (text: string): string[] => {
+    const uuids: string[] = [];
+    const matches = text.match(noteMarkerRegex);;
+    if (!matches) {
+      return uuids;
     }
+    for (const match of matches) {
+      uuids.push(getUuidFromMatch(match));
+    }
+    return  uuids;
   }
 
+  static matchUuidOnActiveLine = (editor: vscode.TextEditor): string | null => {
+    const anchor = editor.selection.anchor;
+    const line = editor.document.lineAt(anchor);
+    return Note.matchUuid(line.text);
+  }
+
+  static matchUuid = (lineText: string): string | null => {
+    const match = lineText.match(noteMarkerRegex);
+    if (match) {
+      const matchText = match[0];
+      return getUuidFromMatch(matchText);
+    }
+    return null;
+  }
+
+  /** does file this note targets exist? */
   async fsExists(): Promise<boolean> {
     try {
-      await fs.stat(this.fsPath);
+      await fs.stat(this.filePath);
       return true;
     } catch (e) {
       return false;
@@ -98,22 +92,25 @@ export class Note implements Props {
     }
   }
 
-  isOverlapped(from: number, to: number): boolean {
-    return this.from <= to && from <= this.to;
-  }
-
   async open(): Promise<void> {
+    globalActiveNoteMarkers[this.uuid] = this;
+    const editor = getEditor();
+    const currentColumn = editor.viewColumn;
+    const viewColumns = vscode.window.visibleTextEditors.length;
+    const targetColumn = currentColumn === 1 ? 2 : 1;
     await vscode.commands.executeCommand(
       "vscode.open",
       vscode.Uri.file(this.notePath),
       {
-        viewColumn: vscode.ViewColumn.Beside,
-        preview: false
+        preview: false,
+        viewColumn: viewColumns > 1 ? targetColumn
+          : vscode.ViewColumn.Beside,
       }
     );
   }
 
   async write(body: string): Promise<void> {
+    globalActiveNoteMarkers[this.uuid] = this;
     return await fs.outputFile(this.notePath, body);
   }
 
@@ -123,105 +120,31 @@ export class Note implements Props {
   }
 
   async readAsMarkdown(): Promise<string> {
-    const [projectRoot] = await getRootFolders(this.fsPath);
-
-    // true if current position is on markdown link like: [issue #123](http://...)
-    let isInLink = false;
+    const wsRoot = getWorkspaceRoot(this.filePath);
+    if (!wsRoot) {
+      return '';
+    }
 
     // read body with replacing link
-    const body = (await this.read()).replace(
-      Note.lineLinkMatcher,
-      (match: string, file?: string, from?: string, to?: string) => {
-        // ignore link if current position is on markdown link
-        if (match === "[") {
-          isInLink = true;
-          return match;
-        } else if (match === "]") {
-          isInLink = false;
-          return match;
-        } else if (isInLink) {
-          return match;
-        }
-
-        if (!from) {
-          return match;
-        }
-        if (!to) {
-          to = from;
-        }
-
-        let fsPath;
-        let preLinkText;
-        let linkText;
-        if (file) {
-          if (
-            file.startsWith("/") &&
-            fs.existsSync(path.join(projectRoot, file))
-          ) {
-            fsPath = path.join(projectRoot, file);
-            preLinkText = "";
-            linkText = match;
-          } else if (
-            fs.existsSync(path.resolve(path.dirname(this.fsPath), file))
-          ) {
-            fsPath = path.resolve(path.dirname(this.fsPath), file);
-            preLinkText = "";
-            linkText = match;
-          } else {
-            // if text exists but the file does not,
-            // "file" string regared as just a string.
-            // i.g. "see->#L123" => "see->[#L123]($command)"
-            fsPath = this.fsPath;
-            preLinkText = file;
-            linkText = match.slice(file.length);
-          }
-        } else {
-          fsPath = this.fsPath;
-          preLinkText = "";
-          linkText = match;
-        }
-
-        return `${preLinkText}[${linkText}](${vscode.Uri.parse(
-          `command:linenote.revealLine?${encodeURIComponent(
-            JSON.stringify({
-              fsPath,
-              from: +from,
-              to: +to
-            })
-          )}`
-        )})`;
-      }
-    );
+    const body = await this.read() || '\\<empty note\\>';
 
     // create footer
     const edit = `[Edit](${vscode.Uri.parse(
       `command:linenote.openNote?${encodeURIComponent(
-        JSON.stringify(this.notePath)
+        JSON.stringify(this.uuid)
       )}`
     )})`;
     const remove = `[Remove](${vscode.Uri.parse(
       `command:linenote.removeNote?${encodeURIComponent(
-        JSON.stringify(this.notePath)
+        JSON.stringify(this.uuid)
       )}`
     )})`;
 
-    return `${body}\n\n*${path.basename(this.notePath)}* ${edit} ${remove}`;
-  }
-
-  // remove empty dir recursively
-  private async removeDir(dir: string): Promise<void> {
-    const [, noteRoot] = await getRootFolders(dir);
-    if (dir.startsWith(noteRoot)) {
-      const files = await fs.readdir(dir);
-      if (!files.length) {
-        await fs.rmdir(dir);
-        await this.removeDir(path.resolve(dir, ".."));
-      }
-    }
+    return `${body}\n\n${edit} ${remove}`;
   }
 
   async remove(): Promise<void> {
+    delete globalActiveNoteMarkers[this.uuid];
     await fs.unlink(this.notePath);
-    await this.removeDir(path.dirname(this.notePath));
   }
 }

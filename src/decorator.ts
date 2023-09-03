@@ -1,11 +1,12 @@
 import * as vscode from "vscode";
-import { filterResolved, splitArr } from "./util";
-import { getCorrespondingNotes, isNotePath } from "./noteUtil";
+import { filterResolved, getNotesDir, splitArr } from "./util";
+import { Note } from "./note";
 
 export class Decorator {
   context: vscode.ExtensionContext;
   lineDecorator?: vscode.TextEditorDecorationType;
   gutterDecorator?: vscode.TextEditorDecorationType;
+  noteMarkerDecorator?: vscode.TextEditorDecorationType;
 
   constructor(context: vscode.ExtensionContext) {
     this.context = context;
@@ -19,30 +20,33 @@ export class Decorator {
     if (this.gutterDecorator) {
       this.gutterDecorator.dispose();
     }
+    if (this.noteMarkerDecorator) {
+      this.noteMarkerDecorator.dispose();
+    }
 
     const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration();
 
-    const lineProp: vscode.DecorationRenderOptions = {};
+    const noteMarkerProp: vscode.DecorationRenderOptions = {};
     const gutterProp: vscode.DecorationRenderOptions = {};
 
     // set line color
     const line: string | undefined = config.get("linenote.lineColor");
     if (line && line.trim().length) {
-      lineProp.backgroundColor = line.trim();
+      noteMarkerProp.backgroundColor = line.trim();
     }
 
     // set ruler color
     const ruler: string | undefined = config.get("linenote.rulerColor");
     if (ruler && ruler.trim().length) {
-      lineProp.overviewRulerLane = vscode.OverviewRulerLane.Right;
-      lineProp.overviewRulerColor = ruler.trim();
+      noteMarkerProp.overviewRulerLane = vscode.OverviewRulerLane.Right;
+      noteMarkerProp.overviewRulerColor = ruler.trim();
     }
 
     const showGutterIcon: boolean | undefined = config.get(
       "linenote.showGutterIcon"
     );
     if (showGutterIcon) {
-      let iconPath: string | undefined = config.get("linenote.gutterIconPath");
+      let iconPath: string | null = config.get<string | null>("linenote.gutterIconPath")!;
       if (iconPath) {
         gutterProp.gutterIconPath = iconPath;
       } else {
@@ -53,65 +57,73 @@ export class Decorator {
       gutterProp.gutterIconSize = "cover";
     }
 
-    this.lineDecorator = vscode.window.createTextEditorDecorationType(lineProp);
+    this.noteMarkerDecorator = vscode.window.createTextEditorDecorationType(noteMarkerProp);
+    this.lineDecorator = vscode.window.createTextEditorDecorationType({});
     this.gutterDecorator = vscode.window.createTextEditorDecorationType(
       gutterProp
     );
   }
 
   async decorate() {
-    if (!vscode.window.activeTextEditor) {
-      return;
-    }
-
-    const editor = vscode.window.activeTextEditor;
-    const fsPath = editor.document.uri.fsPath;
-
-    // do not decorate the note itself
-    if (await isNotePath(fsPath)) {
-      return;
-    }
-
-    // load notes and create decoration options
-    const notes = await getCorrespondingNotes(fsPath);
-    const [lineProps, gutterProps] = splitArr(
-      await filterResolved(
-        notes.map(
-          async (
-            note
-          ): Promise<[vscode.DecorationOptions, vscode.DecorationOptions]> => {
-            const markdown = new vscode.MarkdownString(
-              await note.readAsMarkdown()
-            );
-            markdown.isTrusted = true;
-            return [
-              {
-                range: new vscode.Range(
-                  // subtract 1 because api's line number starts with 0, not 1
-                  editor.document.lineAt(note.from - 1).range.start,
-                  editor.document.lineAt(note.to - 1).range.end
-                ),
-                hoverMessage: markdown
-              },
-              {
-                range: new vscode.Range(
-                  editor.document.lineAt(note.from - 1).range.start,
-                  editor.document.lineAt(note.from - 1).range.start
-                ),
-                hoverMessage: markdown
-              }
-            ];
-          }
+    const editors = vscode.window.visibleTextEditors;
+    for (const editor of editors) {
+      const noteDir = getNotesDir(editor.document.fileName);
+      // load notes and create decoration options
+      const uuids = Note.matchUuids(editor.document.getText());
+      const filePath = editor.document.uri.fsPath;
+      const notes = uuids.map(uuid => new Note({
+        filePath,
+        noteDir,
+        uuid,
+        line: Note.getLine(editor.document, uuid),
+      }));
+      const [lineProps, gutterProps, noteMarkerProps] = splitArr(
+        await filterResolved(
+          notes.map(
+            async (
+              note
+            ): Promise<[vscode.DecorationOptions, vscode.DecorationOptions, vscode.DecorationOptions]> => {
+              const markdown = new vscode.MarkdownString(
+                await note.readAsMarkdown()
+              );
+              markdown.isTrusted = true;
+              const noteLine = editor.document.lineAt(note.line);
+              const line = editor.document.lineAt(note.line + 1);
+              return [
+                {
+                  // line decorator
+                  // notes marker line and noted line
+                  range: new vscode.Range(
+                    // subtract 1 because api's line number starts with 0, not 1
+                    noteLine.range.start,
+                    line.range.end
+                  ),
+                  hoverMessage: markdown,
+                },
+                {
+                  // gutter decorator
+                  range: new vscode.Range(
+                    line.range.start,
+                    line.range.start
+                  ),
+                  hoverMessage: markdown
+                },
+                {
+                  // note marker decoratior
+                  range: new vscode.Range(
+                    noteLine.range.start,
+                    noteLine.range.end
+                  ),
+                }
+              ];
+            }
+          )
         )
-      )
-    );
+      );
 
-    // recheck editor (because I used 'await'!)
-    if (vscode.window.activeTextEditor !== editor) {
-      return;
+      editor.setDecorations(this.noteMarkerDecorator!, noteMarkerProps);
+      editor.setDecorations(this.lineDecorator!, lineProps);
+      editor.setDecorations(this.gutterDecorator!, gutterProps);
     }
-
-    editor.setDecorations(this.lineDecorator!, lineProps);
-    editor.setDecorations(this.gutterDecorator!, gutterProps);
   }
 }

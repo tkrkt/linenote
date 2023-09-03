@@ -1,10 +1,13 @@
 {
-  "command.addNote.title": "Add note at current position",
-  "command.openNote.title": "Open notes at current position",
-  "command.removeNote.title": "Remove the note at current position",
-  "configuration.lineColor.description": "Background color of line with notes (name or HEX)",
-  "configuration.rulerColor.description": "Color of the ruler with notes (name or HEX)",
-  "configuration.automaticallyDelete.description": "If it set to true, notes that do not correspond to files are automatically deleted.",
-  "configuration.showGutterIcon.description": "If it set to true, displays the icon on the line where the note exists.",
-  "configuration.gutterIconPath.description": "File path of the icon to be displayed"
+  "command.addNote.title": "Line Note: Add note at current position",
+  "command.openNote.title": "Line Note: Edit note at current position",
+  "command.revealLine.title": "Line Note: Reveal line in notated file",
+  "command.removeNote.title": "Line Note: Remove note at current position",
+  "configuration.cleanUpOrphanedNotesInterval.description": "Interval at which to clean up unused notes in the background in ms. Only applies if cleanupOprhanedNotes is set to 'on-interval' or 'on-save-and-on-interval'. Default: 60000 (60s). For performance, a large value is recommended. In order to determine if a note has a corresponding marker, the entire project directory must be scanned.",
+  "configuration.cleanUpOrphanedNotes.description": "Whether to cleanup orphaned notes on save file, on change file, on an interval, or never. Default: 'on-save'. Warning: On change file will provide more realtime updates but may affect performance and will delete note files instantly if not found in the changed file. Requires reload.",
+  "configuration.includePaths.description": "File pattern globs to scan for note markers. Unmatched directories will be ignored.",
+  "configuration.gutterIconPath.description": "File path of the icon to be displayed",
+  "configuration.lineColor.description": "Background color of line with notes (name, HEX, or RGB)",
+  "configuration.rulerColor.description": "Color of the ruler with notes (name, HEX, or RGB)",
+  "configuration.showGutterIcon.description": "If it set to true, displays the icon on the line where the note exists. Default true."
 }

@@ -28,20 +28,34 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
-    "commands": [{
-      "command": "linenote.addNote",
-      "title": "%command.addNote.title%"
-    }, {
-      "command": "linenote.openNote",
-      "title": "%command.openNote.title%"
-    }, {
-      "command": "linenote.removeNote",
-      "title": "%command.removeNote.title%"
-    }],
+    "commands": [
+      {
+        "command": "linenote.addNote",
+        "title": "%command.addNote.title%"
+      },
+      {
+        "command": "linenote.openNote",
+        "title": "%command.openNote.title%"
+      },
+      {
+        "command": "linenote.revealLine",
+        "title": "%command.revealLine.title%"
+      },
+      {
+        "command": "linenote.removeNote",
+        "title": "%command.removeNote.title%"
+      }
+    ],
     "menus": {
-      "editor/context": [{
-        "command": "linenote.addNote"
-      }]
+      "editor/context": [
+        {
+          "command": "linenote.addNote"
+        },
+        {
+          "command": "linenote.revealLine",
+          "when": "isActiveEditorNote"
+        }
+      ]
     },
     "configuration": {
       "type": "object",
@@ -57,15 +71,10 @@
           "default": "rgba(255, 255, 0, 0.4)",
           "description": "%configuration.rulerColor.description%"
         },
-        "linenote.automaticallyDelete": {
-          "type": "boolean",
-          "default": true,
-          "description": "%configuration.automaticallyDelete.description%"
-        },
-        "linenote.automaticallyDeleteInterval": {
+        "linenote.cleanUpOrphanedNotesInterval": {
           "type": "integer",
           "default": 60000,
-          "description": "%configuration.automaticallyDeleteInterval.description%"
+          "description": "%configuration.cleanUpOrphanedNotesInterval.description%"
         },
         "linenote.showGutterIcon": {
           "type": "boolean",
@@ -73,9 +82,30 @@
           "description": "%configuration.showGutterIcon.description%"
         },
         "linenote.gutterIconPath": {
-          "type": ["string", "null"],
-          "default": null,
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": "images/gutter.png",
           "description": "%configuration.gutterIconPath.description%"
+        },
+        "linenote.cleanUpOrphanedNotes": {
+          "type": [
+            "on-save",
+            "on-interval",
+            "on-save-and-on-interval",
+            "never"
+          ],
+          "default": "on-save-and-on-interval",
+          "description": "%configuration.cleanUpOrphanedNotes.description%"
+        },
+        "linenote.includePaths": {
+          "type": "array",
+          "default": [
+            "**/src/**/*",
+            "**/.vscode/linenote/**/*"
+          ],
+          "description": "%configuration.includePaths.description%"
         }
       }
     }
@@ -94,12 +124,13 @@
     "@types/node": "^8.10.25",
     "tslint": "^5.8.0",
     "typescript": "^3.1.4",
-    "vscode": "^1.1.25"
+    "vscode": "^1.1.37"
   },
   "dependencies": {
     "@types/fs-extra": "^5.0.4",
     "chokidar": "^2.0.4",
     "fs-extra": "^7.0.1",
-    "lodash.debounce": "^4.0.8"
+    "lodash.debounce": "^4.0.8",
+    "short-uuid": "^4.2.2"
   }
 }
