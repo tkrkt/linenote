@@ -1,5 +1,4 @@
 import * as path from "path";
-import * as fs from "fs-extra";
 import * as vscode from "vscode";
 
 const rejected = Symbol("rejected");
@@ -9,20 +8,6 @@ export const escapeRegex = (regex: string) => {
 }
 
 type Result<T> = T | typeof rejected;
-export const getWorkspaceRoot = (notePath: string, relNotesDir: string) => {
-  const workspaceFolders = vscode.workspace.workspaceFolders!;
-  for (const folder of workspaceFolders) {
-    const folderPath = folder.uri.fsPath
-    if (notePath.indexOf(folderPath) != -1) {
-      const noteDir = path.join(folderPath, relNotesDir);
-      if (!fs.existsSync(noteDir)) {
-          fs.mkdirSync(noteDir);
-      }
-      return noteDir;
-    }
-  }
-  return null;
-}
 
 export const getIncludedFilePaths = async (): Promise<string[]> => {
   const fNames: string[] = [];
