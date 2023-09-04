@@ -1,53 +1,19 @@
 {
-  "name": "linenoteplus",
-  "displayName": "Line Note Plus",
-  "description": "Annotate lines of code with Markdown notes visible on hover.",
-  "version": "2.1.1",
-  "publisher": "prmichaelsen",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "author": {
-    "name": "Patrick Michaelsen",
     "email": "patrickazusa@gmail.com",
+    "name": "Patrick Michaelsen",
     "url": "https://github.com/prmichaelsen"
   },
-  "contributors": [
-    { 
-      "name": "James Norton",
-      "email": "jamesnorton@gmail.com",
-      "url": "https://github.com/indiejames"
-    },
-    { 
-      "name": "tkrkt",
-      "url": "https://github.com/tkrkt"
-    }
-  ],
-  "readme": "./README.md",
-  "engines": {
-    "vscode": "^1.30.0"
+  "bugs": {
+    "email": "patrickazusa@gmail.com",
+    "url": "https://github.com/prmichaelsen/linenoteplus/issues"
   },
   "categories": [
     "Other"
   ],
-  "license": "MIT",
-  "icon": "images/icon.png",
-  "activationEvents": [
-    "onStartupFinished"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/prmichaelsen/linenoteplus.git"
-  },
-  "bugs": {
-    "url": "https://github.com/prmichaelsen/linenoteplus/issues",
-    "email": "patrickazusa@gmail.com"
-  },
-  "keywords": [
-    "note",
-    "comment",
-    "annotation",
-    "sidenotes",
-    "marginalia"
-  ],
-  "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
@@ -67,6 +33,58 @@
         "title": "%command.removeNote.title%"
       }
     ],
+    "configuration": {
+      "properties": {
+        "linenoteplus.cleanUpOrphanedNotes": {
+          "default": "on-save-and-on-interval",
+          "description": "%configuration.cleanUpOrphanedNotes.description%",
+          "type": [
+            "on-save",
+            "on-interval",
+            "on-save-and-on-interval",
+            "never"
+          ]
+        },
+        "linenoteplus.cleanUpOrphanedNotesInterval": {
+          "default": 60000,
+          "description": "%configuration.cleanUpOrphanedNotesInterval.description%",
+          "type": "integer"
+        },
+        "linenoteplus.gutterIconPath": {
+          "default": "images/gutter.png",
+          "description": "%configuration.gutterIconPath.description%",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "linenoteplus.includePaths": {
+          "default": [
+            "**/src/**/*",
+            "**/.vscode/.linenoteplus/**/*"
+          ],
+          "description": "%configuration.includePaths.description%",
+          "type": "array"
+        },
+        "linenoteplus.lineColor": {
+          "default": "rgba(255, 255, 0, 0.05)",
+          "description": "%configuration.lineColor.description%",
+          "type": "string"
+        },
+        "linenoteplus.rulerColor": {
+          "default": "rgba(255, 255, 0, 0.4)",
+          "description": "%configuration.rulerColor.description%",
+          "type": "string"
+        },
+        "linenoteplus.showGutterIcon": {
+          "default": true,
+          "description": "%configuration.showGutterIcon.description%",
+          "type": "boolean"
+        }
+      },
+      "title": "Line Note Plus",
+      "type": "object"
+    },
     "menus": {
       "editor/context": [
         {
@@ -77,67 +95,27 @@
           "when": "isActiveEditorNote"
         }
       ]
-    },
-    "configuration": {
-      "type": "object",
-      "title": "Line Note Plus",
-      "properties": {
-        "linenoteplus.lineColor": {
-          "type": "string",
-          "default": "rgba(255, 255, 0, 0.05)",
-          "description": "%configuration.lineColor.description%"
-        },
-        "linenoteplus.rulerColor": {
-          "type": "string",
-          "default": "rgba(255, 255, 0, 0.4)",
-          "description": "%configuration.rulerColor.description%"
-        },
-        "linenoteplus.cleanUpOrphanedNotesInterval": {
-          "type": "integer",
-          "default": 60000,
-          "description": "%configuration.cleanUpOrphanedNotesInterval.description%"
-        },
-        "linenoteplus.showGutterIcon": {
-          "type": "boolean",
-          "default": true,
-          "description": "%configuration.showGutterIcon.description%"
-        },
-        "linenoteplus.gutterIconPath": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "default": "images/gutter.png",
-          "description": "%configuration.gutterIconPath.description%"
-        },
-        "linenoteplus.cleanUpOrphanedNotes": {
-          "type": [
-            "on-save",
-            "on-interval",
-            "on-save-and-on-interval",
-            "never"
-          ],
-          "default": "on-save-and-on-interval",
-          "description": "%configuration.cleanUpOrphanedNotes.description%"
-        },
-        "linenoteplus.includePaths": {
-          "type": "array",
-          "default": [
-            "**/src/**/*",
-            "**/.vscode/.linenoteplus/**/*"
-          ],
-          "description": "%configuration.includePaths.description%"
-        }
-      }
     }
   },
-  "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "postinstall": "node ./node_modules/vscode/bin/install",
-    "test": "npm run compile && node ./node_modules/vscode/bin/test"
+  "contributors": [
+    {
+      "email": "jamesnorton@gmail.com",
+      "name": "James Norton",
+      "url": "https://github.com/indiejames"
+    },
+    {
+      "name": "tkrkt",
+      "url": "https://github.com/tkrkt"
+    }
+  ],
+  "dependencies": {
+    "@types/fs-extra": "^5.0.4",
+    "chokidar": "^2.0.4",
+    "fs-extra": "^7.0.1",
+    "lodash.debounce": "^4.0.8",
+    "short-uuid": "^4.2.2"
   },
+  "description": "Annotate lines of code with Markdown notes visible on hover.",
   "devDependencies": {
     "@types/chokidar": "^1.7.5",
     "@types/lodash.debounce": "^4.0.4",
@@ -147,11 +125,33 @@
     "typescript": "^3.1.4",
     "vscode": "^1.1.37"
   },
-  "dependencies": {
-    "@types/fs-extra": "^5.0.4",
-    "chokidar": "^2.0.4",
-    "fs-extra": "^7.0.1",
-    "lodash.debounce": "^4.0.8",
-    "short-uuid": "^4.2.2"
-  }
+  "displayName": "Line Note Plus",
+  "engines": {
+    "vscode": "^1.30.0"
+  },
+  "icon": "images/icon.png",
+  "keywords": [
+    "note",
+    "comment",
+    "annotation",
+    "sidenotes",
+    "marginalia"
+  ],
+  "license": "MIT",
+  "main": "./out/extension.js",
+  "name": "linenoteplus",
+  "publisher": "prmichaelsen",
+  "readme": "./README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/prmichaelsen/linenoteplus.git"
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "test": "npm run compile && node ./node_modules/vscode/bin/test",
+    "vscode:prepublish": "npm run compile",
+    "watch": "tsc -watch -p ./"
+  },
+  "version": "2.1.1"
 }
