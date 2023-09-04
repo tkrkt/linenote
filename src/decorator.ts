@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
-import { filterResolved, getNotesDir, splitArr } from "./util";
+import { filterResolved, splitArr } from "./util";
 import { Note } from "./note";
+import { getNotesDir } from "./noteUtil";
 
 export class Decorator {
   context: vscode.ExtensionContext;

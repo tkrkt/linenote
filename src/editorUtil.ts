@@ -1,8 +1,7 @@
 import * as vscode from 'vscode';
 import { Note } from './note';
-import { getOrphanedUuidsForCurDoc, isNotePath } from './noteUtil';
+import { getNotesDir, getOrphanedUuidsForCurDoc, isNotePath } from './noteUtil';
 import { globalActiveNoteMarkers } from './extension';
-import { getNotesDir } from './util';
 
 
 export const getEditor = () => {

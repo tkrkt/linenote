@@ -4,40 +4,12 @@ import * as vscode from "vscode";
 
 const rejected = Symbol("rejected");
 
+export const escapeRegex = (regex: string) => {
+  return regex.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 type Result<T> = T | typeof rejected;
-
-export const getNotePrefix = () => {
-  // TODO make configurable
-  return 'note:';
-}
-
-export const getUuidFromMatch = (match: string) => {
-  return match.split(getNotePrefix())[1].trim();
-}
-
-export const getUuidFromNotePath = (notePath: string) => {
-  const parts = notePath.split(path.sep);
-  const uuid = parts[parts.length - 1].split('.md')[0];
-  return uuid;
-}
-
-export const relNotesDir = '.vscode/linenoteplus';
-export const getNotesDir = (filePath: string) => {
-  const workspaceFolders = vscode.workspace.workspaceFolders!;
-  for (const folder of workspaceFolders) {
-    const folderPath = folder.uri.fsPath
-    if (filePath.indexOf(folderPath) != -1) {
-      const noteDir = path.join(folderPath, relNotesDir);
-      if (!fs.existsSync(noteDir)) {
-          fs.mkdirSync(noteDir);
-      }
-      return noteDir;
-    }
-  }
-  throw new Error(`Unable to find or create note directory "${relNotesDir}".`);
-}
-
-export const getWorkspaceRoot = (notePath: string) => {
+export const getWorkspaceRoot = (notePath: string, relNotesDir: string) => {
   const workspaceFolders = vscode.workspace.workspaceFolders!;
   for (const folder of workspaceFolders) {
     const folderPath = folder.uri.fsPath
@@ -66,12 +38,12 @@ export const getIncludedFilePaths = async (): Promise<string[]> => {
   return fNames;
 };
 
-// convert from $PROJECT_ROOT to $PROJECT_ROOT/.vscode/linenoteplus
+// convert from $PROJECT_ROOT to $PROJECT_ROOT/.vscode/.linenoteplus
 export const fromProjectRootToNoteRoot = (projectRoot: string): string => {
   return path.join(projectRoot, ".vscode", "linenoteplus");
 };
 
-// get [projectRoot, noteRoot(=projectRot/.vscode/linenoteplus)] from file path.
+// get [projectRoot, noteRoot(=projectRot/.vscode/.linenoteplus)] from file path.
 export const getRootFolders = async (
   fsPath: string
 ): Promise<[string, string]> => {

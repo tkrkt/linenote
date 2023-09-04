@@ -1,9 +1,26 @@
 {
   "name": "linenoteplus",
   "displayName": "Line Note Plus",
-  "description": "Add notes to the line of source code",
-  "version": "1.2.2",
+  "description": "Annotate lines of code with Markdown notes visible on hover.",
+  "version": "2.1.0",
   "publisher": "prmichaelsen",
+  "author": {
+    "name": "Patrick Michaelsen",
+    "email": "patrickazusa@gmail.com",
+    "url": "https://github.com/prmichaelsen"
+  },
+  "contributors": [
+    { 
+      "name": "James Norton",
+      "email": "jamesnorton@gmail.com",
+      "url": "https://github.com/indiejames"
+    },
+    { 
+      "name": "tkrkt",
+      "url": "https://github.com/tkrkt"
+    }
+  ],
+  "readme": "./README.md",
   "engines": {
     "vscode": "^1.30.0"
   },
@@ -13,20 +30,22 @@
   "license": "MIT",
   "icon": "images/icon.png",
   "activationEvents": [
-    "*"
+    "onStartupFinished"
   ],
   "repository": {
     "type": "git",
     "url": "https://github.com/prmichaelsen/linenoteplus.git"
   },
+  "bugs": {
+    "url": "https://github.com/prmichaelsen/linenoteplus/issues",
+    "email": "patrickazusa@gmail.com"
+  },
   "keywords": [
-    "vscode",
     "note",
     "comment",
-    "notataion",
     "annotation",
-    "line",
-    "tooltip"
+    "sidenotes",
+    "marginalia"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -105,7 +124,7 @@
           "type": "array",
           "default": [
             "**/src/**/*",
-            "**/.vscode/linenoteplus/**/*"
+            "**/.vscode/.linenoteplus/**/*"
           ],
           "description": "%configuration.includePaths.description%"
         }

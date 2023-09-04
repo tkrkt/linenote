@@ -3,7 +3,8 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { getEditor } from "./editorUtil";
 import { globalActiveNoteMarkers } from "./extension";
-import { getUuidFromMatch, getWorkspaceRoot } from "./util";
+import { getWorkspaceRoot } from "./util";
+import { getNoteMarkerRegex, getUuidFromMatch, relNotesDir } from "./noteUtil";
 
 export interface Props {
   filePath: string;
@@ -19,8 +20,6 @@ export interface ConstructorProps {
   line: number;
 }
 
-export const uuidRegex = /^[A-Za-z0-9]{1,}$/;
-export const noteMarkerRegex = /note:\s*[A-Za-z0-9]{1,}\s/gm;
 export class Note implements Props {
   filePath: string;
   notePath: string;
@@ -30,7 +29,7 @@ export class Note implements Props {
   constructor(props: ConstructorProps) {
     this.filePath = props.filePath;
     this.uuid = props.uuid,
-    // e.g. $PROJECT_ROOT/.vscode/linenoteplus/73WakrfVbNJBaAmhQtEeDv.md
+    // e.g. $PROJECT_ROOT/.vscode/.linenoteplus/73WakrfVbNJBaAmhQtEeDv.md
     this.notePath = path.join(props.noteDir, this.uuid + '.md');
     this.line = props.line;
   }
@@ -48,7 +47,7 @@ export class Note implements Props {
 
   static matchUuids = (text: string): string[] => {
     const uuids: string[] = [];
-    const matches = text.match(noteMarkerRegex);;
+    const matches = text.match(getNoteMarkerRegex());;
     if (!matches) {
       return uuids;
     }
@@ -65,7 +64,7 @@ export class Note implements Props {
   }
 
   static matchUuid = (lineText: string): string | null => {
-    const match = lineText.match(noteMarkerRegex);
+    const match = lineText.match(getNoteMarkerRegex());
     if (match) {
       const matchText = match[0];
       return getUuidFromMatch(matchText);
@@ -120,7 +119,7 @@ export class Note implements Props {
   }
 
   async readAsMarkdown(): Promise<string> {
-    const wsRoot = getWorkspaceRoot(this.filePath);
+    const wsRoot = getWorkspaceRoot(this.filePath, relNotesDir);
     if (!wsRoot) {
       return '';
     }

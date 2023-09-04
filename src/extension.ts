@@ -10,11 +10,13 @@ import { CleanUpOrphanedNodesConf, getEditor, onDidSaveTextDocument, updateIsAct
 import { Note } from "./note";
 import {
   cleanUpOrphanedNotes,
+  getNotePrefix,
+  getNotesDir,
+  getUuidFromNotePath,
   initializeGlobalActiveNoteMarkers,
   isNotePath,
   watchCorrespondingNotes,
 } from "./noteUtil";
-import { getNotesDir, getUuidFromNotePath } from "./util";
 import debounce = require("lodash.debounce");
 
 export type GlobalActiveNoteMarkers = Record<string, Note>;
@@ -33,7 +35,7 @@ export const activate = (context: vscode.ExtensionContext) => {
   const exclude: any = conf.get('files.exclude');
   const excludeFiles = {
     ...exclude,
-    ['.vscode/linenoteplus']: true,
+    ['.vscode/.linenoteplus']: true,
   };
   conf.update('files.exclude', excludeFiles);
   
@@ -163,9 +165,9 @@ export const activate = (context: vscode.ExtensionContext) => {
       const placeHolderUuid = short.generate().toString();
       const uuid = await vscode.window.showInputBox({
         placeHolder: placeHolderUuid,
-        prompt: 'Enter name for note:',
+        prompt: 'Enter name for note',
       }) || placeHolderUuid;
-      const marker = `note:${uuid} ${editText} ${removeText}\n`;
+      const marker = `${getNotePrefix()}${uuid} ${editText} ${removeText}\n`;
       const isSuccessful = await editor.edit(edit => {
           edit.insert(commentPos, marker);
       }, {

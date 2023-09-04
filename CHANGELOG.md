@@ -34,3 +34,7 @@
 - Fixed a bug that range of hyperlink in the note is wrong
 - Fixed a bug that was incorrectly parsed when using # in markdown links
 - Fixed a bug that can not open hyperlink to another file in the note
+
+## [2.0.0]
+
+Breaks backwards compatability. Feature overhaul into "Line Note Plus"

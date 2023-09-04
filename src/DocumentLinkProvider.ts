@@ -1,6 +1,6 @@
 import { DocumentLink, DocumentLinkProvider, Position, ProviderResult, Range, TextDocument, Uri } from "vscode";
 import { Note } from "./note";
-import { getNotePrefix } from "./util";
+import { getNotePrefix } from "./noteUtil";
 
 export const editText = '[Edit]';
 export const removeText = '[Remove]';
