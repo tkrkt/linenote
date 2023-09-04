@@ -80,6 +80,11 @@
           "default": true,
           "description": "%configuration.showGutterIcon.description%",
           "type": "boolean"
+        },
+        "linenoteplus.notesDirectory": {
+          "default": ".vscode/.linenoteplus",
+          "description": "%configuration.notesDirectory.description%",
+          "type": "string"
         }
       },
       "title": "Line Note Plus",
@@ -153,5 +158,5 @@
     "vscode:prepublish": "npm run compile",
     "watch": "tsc -watch -p ./"
   },
-  "version": "2.1.4"
+  "version": "2.2.0"
 }

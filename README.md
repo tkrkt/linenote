@@ -12,7 +12,7 @@ that are visible when hovering over the noted line. Based on [Line Note](https:/
 Invoke `Add note at current position` from the command palette or context menu.
 You can see the note you wrote as hover text.
 
-Notes are saved in `$PROJECT_ROOT/.vscode/.linenoteplus` like `.vscode/.linenoteplus/<short-uid>.md`.
+Notes are saved by default in `$PROJECT_ROOT/.vscode/.linenoteplus` like `.vscode/.linenoteplus/<short-uid>.md`.
 
 ### Overview
 * Edit/open or remove note via Cmd + Click
@@ -30,7 +30,7 @@ Notes are saved in `$PROJECT_ROOT/.vscode/.linenoteplus` like `.vscode/.linenote
 * Notes can be moved between files
 * Notes are not affected by refactors
 * Add notes within your notes
-* Customize note marker background color and annoted line ruler color
+* Customize notes directory, note marker background color, and annoted line ruler color
 * Configure to delete orphaned notes `on-save`, `on-inteveral`, `on-save-and-on-interval`, or `never`
 
 ### API

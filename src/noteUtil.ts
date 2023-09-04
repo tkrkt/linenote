@@ -1,15 +1,15 @@
+import * as chokidar from "chokidar";
 import * as fs from "fs-extra";
 import * as path from "path";
-import * as chokidar from "chokidar";
+import * as vscode from 'vscode';
+import { GlobalActiveNoteMarkers, globalActiveNoteMarkers } from "./extension";
+import { Note } from "./note";
 import {
+  escapeRegex,
   getIncludedFilePaths,
   identityDiffArr,
   keys,
-  escapeRegex,
 } from "./util";
-import { Note } from "./note";
-import * as vscode from 'vscode';
-import { GlobalActiveNoteMarkers, globalActiveNoteMarkers } from "./extension";
 
 
 export const getNotePrefix = () => {
@@ -28,8 +28,9 @@ export const getUuidFromNotePath = (notePath: string) => {
   return uuid;
 }
 
-export const relNotesDir = '.vscode/.linenoteplus';
 export const getNotesDir = (filePath: string) => {
+  const conf = vscode.workspace.getConfiguration();
+  const relNotesDir: any = conf.get('linenoteplus.notesDirectory');
   const workspaceFolders = vscode.workspace.workspaceFolders!;
   for (const folder of workspaceFolders) {
     const folderPath = folder.uri.fsPath
@@ -169,7 +170,7 @@ export const initializeGlobalActiveNoteMarkers = async (
   const workspaceFolders = vscode.workspace.workspaceFolders!;
   for (const folder of workspaceFolders) {
     const folderPath = folder.uri.fsPath
-    const noteDir = path.join(folderPath, relNotesDir);
+    const noteDir = getNotesDir(folderPath);
     const filePaths = await getIncludedFilePaths();
     for (const filePath of filePaths) {
       const document = await vscode.workspace.openTextDocument(filePath);
