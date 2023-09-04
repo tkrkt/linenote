@@ -19,6 +19,8 @@ Notes are saved in `$PROJECT_ROOT/.vscode/.linenoteplus` like `.vscode/.linenote
 * Markdown note previews on hover
 * Right-click to add note to line
 * Right-click to reveal notated line
+* Delete a note marker by manually deleting in text editor
+* Add a note marker by manually typing in text editor
 * Custom note names
 * Command to add note
 * Command to edit/open note
@@ -27,6 +29,9 @@ Notes are saved in `$PROJECT_ROOT/.vscode/.linenoteplus` like `.vscode/.linenote
 * Notes move with code changes
 * Notes can be moved between files
 * Notes are not affected by refactors
+* Add notes within your notes
+* Customize note marker background color and annoted line ruler color
+* Configure to delete orphaned notes `on-save`, `on-inteveral`, `on-save-and-on-interval`, or `never`
 
 ### API
 #### Commands
