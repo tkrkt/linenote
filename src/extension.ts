@@ -33,9 +33,10 @@ export const activate = (context: vscode.ExtensionContext) => {
 
   const conf = vscode.workspace.getConfiguration();
   const exclude: any = conf.get('files.exclude');
+  const noteDir: any = conf.get('linenoteplus.notesDirectory');
   const excludeFiles = {
     ...exclude,
-    ['.vscode/.linenoteplus']: true,
+    [noteDir]: true,
   };
   conf.update('files.exclude', excludeFiles);
   
@@ -149,7 +150,8 @@ export const activate = (context: vscode.ExtensionContext) => {
         event.affectsConfiguration("linenoteplus.lineColor") ||
         event.affectsConfiguration("linenoteplus.rulerColor") || 
         event.affectsConfiguration("linenoteplus.cleanupOrphanedNotes") ||
-        event.affectsConfiguration("linenoteplus.cleanupOrphanedNotesInterval")
+        event.affectsConfiguration("linenoteplus.cleanupOrphanedNotesInterval") ||
+        event.affectsConfiguration("linenoteplus.notesDirectory")
       ) {
         decorator.reload();
         decorator.decorate();
@@ -238,7 +240,7 @@ export const activate = (context: vscode.ExtensionContext) => {
         if (_uuid) {
           // remove specified note (when invoked from the hover text)
           const note = globalActiveNoteMarkers[_uuid];
-          if (note.line > 0) {
+          if (note.line > -1) {
             const uri = vscode.Uri.parse(note.filePath);
             const document = await vscode.workspace.openTextDocument(uri);
             const line = document.lineAt(note.line);

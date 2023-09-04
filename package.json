@@ -2,7 +2,7 @@
   "name": "linenoteplus",
   "displayName": "Line Note Plus",
   "description": "Annotate lines of code with Markdown notes visible on hover.",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "publisher": "prmichaelsen",
   "author": {
     "name": "Patrick Michaelsen",
