@@ -3,7 +3,6 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { getEditor } from "./editorUtil";
 import { globalActiveNoteMarkers } from "./extension";
-import { getWorkspaceRoot } from "./util";
 import { getNoteMarkerRegex, getUuidFromMatch, relNotesDir } from "./noteUtil";
 
 export interface Props {
@@ -114,18 +113,29 @@ export class Note implements Props {
   }
 
   async read(): Promise<string> {
-    const buffer = await fs.readFile(this.notePath);
-    return buffer.toString();
+    try {
+      const buffer = await fs.readFile(this.notePath);
+      return buffer.toString();
+    } catch (e) {
+      throw new Error(
+        `003: Tried to read note with uuid "${this.uuid}"` +
+        `at path "${this.notePath}" ` +
+        `at for file "${this.filePath}" ` +
+        `at line "${this.line}" ` +
+        `but the path did not exist.`
+      );
+    }
   }
 
   async readAsMarkdown(): Promise<string> {
-    const wsRoot = getWorkspaceRoot(this.filePath, relNotesDir);
-    if (!wsRoot) {
-      return '';
-    }
+    let body = '\\<empty note\\>';
 
-    // read body with replacing link
-    const body = await this.read() || '\\<empty note\\>';
+    if (await this.noteExists()) {
+      const noteText = await this.read();
+      if (noteText.trim() !== '') {
+        body = await this.read();
+      }
+    }
 
     // create footer
     const edit = `[Edit](${vscode.Uri.parse(
