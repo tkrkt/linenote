@@ -158,5 +158,5 @@
     "vscode:prepublish": "npm run compile",
     "watch": "tsc -watch -p ./"
   },
-  "version": "2.2.0"
+  "version": "2.2.1"
 }

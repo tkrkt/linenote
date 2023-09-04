@@ -41,7 +41,6 @@ export const activate = (context: vscode.ExtensionContext) => {
   conf.update('files.exclude', excludeFiles);
   
   const cleanUpOnInterval = () => {
-    cleanUpOrphanedNotes();
     // watch orphaned notes
     const automaticallyDelete = async () => {
       if (disposed) {

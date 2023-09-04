@@ -75,14 +75,9 @@ export const cleanUpOrphanedNotes = async () => {
       keys(globalActiveNoteMarkers)
         .map(k => globalActiveNoteMarkers[k].uuid);
     const uuidsToDelete = identityDiffArr(uuids, activeUuids);
-    for (const uuid of uuids) {
-      const note = new Note({
-        filePath,
-        noteDir,
-        uuid,
-        line: -1,
-      });
-      globalActiveNoteMarkers[uuid] = note;
+    for (const uuid of uuidsToDelete) {
+      const note = globalActiveNoteMarkers[uuid as string];
+      note.line = -1;
     }
     await Promise.all(uuidsToDelete.map(async uuid => {
       if (uuid) {
