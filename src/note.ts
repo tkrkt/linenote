@@ -3,7 +3,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { getEditor } from "./editorUtil";
 import { globalActiveNoteMarkers } from "./extension";
-import { getNoteMarkerRegex, getUuidFromMatch, relNotesDir } from "./noteUtil";
+import { getNoteMarkerRegex, getUuidFromMatch } from "./noteUtil";
 
 export interface Props {
   filePath: string;

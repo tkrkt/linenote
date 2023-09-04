@@ -1,13 +1,14 @@
 {
   "command.addNote.title": "Line Note Plus: Add note at current position (Annotate Line)",
   "command.openNote.title": "Line Note Plus: Edit note at current position (Open Note)",
-  "command.revealLine.title": "Line Note Plus: Reveal line in notated file (Show Note Marker)",
   "command.removeNote.title": "Line Note Plus: Remove note at current position (Delete Note)",
-  "configuration.cleanUpOrphanedNotesInterval.description": "Interval at which to clean up unused notes in the background in ms. Only applies if `cleanUpOrphanedNotes` is set to `on-interval` or `on-save-and-on-interval`. Default: `60000` (60s). For performance, a larger value is recommended.",
+  "command.revealLine.title": "Line Note Plus: Reveal line in notated file (Show Note Marker)",
   "configuration.cleanUpOrphanedNotes.description": "Defines the cleanup behavior for orphaned notes. It can be set to `on-save`, `on-interval`, `on-save-and-on-interval`, or `never`. Default: `on-save-and-on-internal`. Note that when using `on-save` or `on-save-and-on-interval`, if you delete a note marker and save the file then your note file will also be deleted.",
-  "configuration.includePaths.description": "Specifies file pattern globs to scan for note markers. Directories that don't match these patterns will be ignored.",
+  "configuration.cleanUpOrphanedNotesInterval.description": "Interval at which to clean up unused notes in the background in ms. Only applies if `cleanUpOrphanedNotes` is set to `on-interval` or `on-save-and-on-interval`. Default: `60000` (60s). For performance, a larger value is recommended.",
   "configuration.gutterIconPath.description": "File path of the icon to be displayed in gutter.",
+  "configuration.includePaths.description": "Specifies file pattern globs to scan for note markers. Directories that don't match these patterns will be ignored.",
   "configuration.lineColor.description": "Sets the background color for inline note markers (Name, HEX, or RGB).",
+  "configuration.notesDirectory.description": "Directory to store saved notes. Default: `.vscode/.linenoteplus`.",
   "configuration.rulerColor.description": "Sets the ruler color for notated lines (Name, HEX, or RGB).",
   "configuration.showGutterIcon.description": "Whether to display the gutter icon in the gutter for a noted line. Default: `true`."
 }

@@ -24,26 +24,6 @@ export const getIncludedFilePaths = async (): Promise<string[]> => {
   return fNames;
 };
 
-// convert from $PROJECT_ROOT to $PROJECT_ROOT/.vscode/.linenoteplus
-export const fromProjectRootToNoteRoot = (projectRoot: string): string => {
-  return path.join(projectRoot, ".vscode", "linenoteplus");
-};
-
-// get [projectRoot, noteRoot(=projectRot/.vscode/.linenoteplus)] from file path.
-export const getRootFolders = async (
-  fsPath: string
-): Promise<[string, string]> => {
-  const workspaceFolder = vscode.workspace.getWorkspaceFolder(
-    vscode.Uri.file(fsPath)
-  );
-  if (workspaceFolder) {
-    const projectRoot = workspaceFolder.uri.fsPath;
-    return [projectRoot, fromProjectRootToNoteRoot(projectRoot)];
-  } else {
-    throw new Error("workspace not found");
-  }
-};
-
 // convert from Promise<T>[] to Promise<T[]> by filtering resolved promises
 export const filterResolved = async <T>(
   promises: Promise<T>[]
